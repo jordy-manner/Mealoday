@@ -6,9 +6,10 @@ import { RecipeForm } from "../recipe-form";
 export const metadata = { title: "Nouvelle recette" };
 
 export default async function NewRecipePage() {
-  const [ingredients, units] = await Promise.all([
+  const [ingredients, units, tags] = await Promise.all([
     prisma.ingredient.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
     prisma.unit.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
+    prisma.tag.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
   ]);
 
   return (
@@ -22,6 +23,7 @@ export default async function NewRecipePage() {
         submitLabel="Créer la recette"
         ingredientOptions={ingredients.map((i) => i.name)}
         unitOptions={units.map((u) => u.name)}
+        tagOptions={tags.map((t) => t.name)}
       />
     </main>
   );

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useActionState, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import type { FormState } from "./actions";
+import { TagsCombobox } from "./tags-combobox";
 
 type IngredientRow = { key: number; name: string; quantity: string; unit: string };
 
@@ -15,7 +16,7 @@ export type RecipeFormValues = {
   cookTime: string;
   ingredients: { name: string; quantity: string; unit: string }[];
   steps: string; // une ligne par étape
-  tags: string; // séparés par des virgules
+  tags: string[]; // tags sélectionnés
 };
 
 const EMPTY: RecipeFormValues = {
@@ -26,7 +27,7 @@ const EMPTY: RecipeFormValues = {
   cookTime: "",
   ingredients: [],
   steps: "",
-  tags: "",
+  tags: [],
 };
 
 function SubmitButton({ label }: { label: string }) {
@@ -52,12 +53,14 @@ export function RecipeForm({
   submitLabel,
   ingredientOptions,
   unitOptions,
+  tagOptions,
 }: {
   action: (prev: FormState, formData: FormData) => Promise<FormState>;
   defaultValues?: RecipeFormValues;
   submitLabel: string;
   ingredientOptions: string[];
   unitOptions: string[];
+  tagOptions: string[];
 }) {
   const [state, formAction] = useActionState(action, { error: null });
 
@@ -219,10 +222,8 @@ export function RecipeForm({
       </div>
 
       <div>
-        <label htmlFor="tags" className={labelCls}>
-          Tags <span className="text-zinc-500">(séparés par des virgules)</span>
-        </label>
-        <input id="tags" name="tags" defaultValue={defaultValues.tags} className={`${field} w-full`} placeholder="dessert, rapide, végétarien" />
+        <span className={labelCls}>Tags</span>
+        <TagsCombobox name="tag" options={tagOptions} defaultValue={defaultValues.tags} />
       </div>
 
       <div className="flex items-center gap-3">

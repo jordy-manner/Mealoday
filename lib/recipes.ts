@@ -169,7 +169,7 @@ export function recipeInputFromFormData(formData: FormData): ValidationResult {
     cookTime: formData.get("cookTime"),
     ingredients,
     steps: formData.get("steps"),
-    tags: formData.get("tags"),
+    tags: formData.getAll("tag"), // un input hidden par tag (TagsCombobox)
   });
 }
 
