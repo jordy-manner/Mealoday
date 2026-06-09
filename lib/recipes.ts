@@ -100,6 +100,46 @@ export function validateRecipeInput(raw: Record<string, unknown>): ValidationRes
   };
 }
 
+// --- Helpers pour les écritures Prisma (objets simples, sans import Prisma) ---
+
+/** Champs scalaires de Recipe (steps reste une colonne Json). */
+export function recipeScalars(input: RecipeInput) {
+  return {
+    title: input.title,
+    description: input.description,
+    servings: input.servings,
+    prepTime: input.prepTime,
+    cookTime: input.cookTime,
+    steps: input.steps,
+  };
+}
+
+/** Lignes d'ingrédients à créer (relation one-to-many), ordre préservé. */
+export function ingredientsCreate(input: RecipeInput) {
+  return input.ingredients.map((name, position) => ({ name, position }));
+}
+
+/**
+ * Lignes de jonction RecipeTag à créer : pour chaque tag, on crée le lien et
+ * on connecte (ou crée) le Tag par son `name` unique.
+ */
+export function recipeTagsCreate(input: RecipeInput) {
+  return input.tags.map((name) => ({
+    tag: { connectOrCreate: { where: { name }, create: { name } } },
+  }));
+}
+
+/**
+ * Aplatit la relation `recipeTags` en un tableau `tags: { id, name }[]`
+ * pour garder une forme ergonomique côté API et pages.
+ */
+export function withFlatTags<
+  T extends { recipeTags: { tag: { id: string; name: string } }[] },
+>(recipe: T): Omit<T, "recipeTags"> & { tags: { id: string; name: string }[] } {
+  const { recipeTags, ...rest } = recipe;
+  return { ...rest, tags: recipeTags.map((rt) => rt.tag) };
+}
+
 /** Extrait les champs d'une recette depuis un FormData. */
 export function recipeInputFromFormData(formData: FormData): ValidationResult {
   return validateRecipeInput({

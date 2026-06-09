@@ -22,15 +22,18 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // lang="fr" : l'app est en français (accessibilité/SEO).
+  // suppressHydrationWarning sur <html> ET <body> : des extensions
+  // (traduction, ColorZilla, Grammarly…) réécrivent lang / style sur <html>
+  // ou injectent des attributs sur <body> après le rendu serveur, d'où un faux
+  // mismatch d'hydratation. L'option n'agit qu'au niveau de la balise où elle
+  // est posée ; les enfants restent vérifiés normalement.
   return (
     <html
-      lang="en"
+      lang="fr"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      {/* suppressHydrationWarning : certaines extensions de navigateur
-          (ColorZilla, Grammarly…) injectent des attributs sur <body> après
-          le rendu serveur, ce qui provoque un faux mismatch d'hydratation.
-          Limité au <body> ; les enfants restent vérifiés normalement. */}
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         {children}
       </body>

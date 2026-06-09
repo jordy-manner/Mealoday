@@ -1,12 +1,17 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { withFlatTags } from "@/lib/recipes";
 
 export const metadata = { title: "Recettes" };
 
 export default async function RecipesPage() {
-  const recipes = await prisma.recipe.findMany({
+  const rows = await prisma.recipe.findMany({
     orderBy: { createdAt: "desc" },
+    include: {
+      recipeTags: { include: { tag: true }, orderBy: { tag: { name: "asc" } } },
+    },
   });
+  const recipes = rows.map(withFlatTags);
 
   return (
     <main className="mx-auto w-full max-w-3xl px-6 py-10">
@@ -36,7 +41,7 @@ export default async function RecipesPage() {
                   <span className="font-medium">{recipe.title}</span>
                   {recipe.tags.length > 0 && (
                     <span className="shrink-0 text-xs text-zinc-500">
-                      {recipe.tags.join(" · ")}
+                      {recipe.tags.map((tag) => tag.name).join(" · ")}
                     </span>
                   )}
                 </div>

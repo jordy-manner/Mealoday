@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { asLines } from "@/lib/recipes";
+import { asLines, withFlatTags } from "@/lib/recipes";
 import { updateRecipeAction } from "../../actions";
 import { RecipeForm } from "../../recipe-form";
 
@@ -13,11 +13,19 @@ export const metadata = { title: "Modifier la recette" };
 
 export default async function EditRecipePage({ params }: Props) {
   const { id } = await params;
-  const recipe = await prisma.recipe.findUnique({ where: { id } });
+  const row = await prisma.recipe.findUnique({
+    where: { id },
+    include: {
+      ingredients: { orderBy: { position: "asc" } },
+      recipeTags: { include: { tag: true }, orderBy: { tag: { name: "asc" } } },
+    },
+  });
 
-  if (!recipe) {
+  if (!row) {
     notFound();
   }
+
+  const recipe = withFlatTags(row);
 
   // updateRecipeAction(id, prevState, formData) → on fige l'id via bind.
   const action = updateRecipeAction.bind(null, recipe.id);
@@ -37,9 +45,9 @@ export default async function EditRecipePage({ params }: Props) {
           servings: recipe.servings?.toString() ?? "",
           prepTime: recipe.prepTime?.toString() ?? "",
           cookTime: recipe.cookTime?.toString() ?? "",
-          ingredients: asLines(recipe.ingredients).join("\n"),
+          ingredients: recipe.ingredients.map((i) => i.name).join("\n"),
           steps: asLines(recipe.steps).join("\n"),
-          tags: recipe.tags.join(", "),
+          tags: recipe.tags.map((t) => t.name).join(", "),
         }}
       />
     </main>

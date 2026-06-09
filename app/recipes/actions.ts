@@ -3,7 +3,12 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { recipeInputFromFormData } from "@/lib/recipes";
+import {
+  ingredientsCreate,
+  recipeInputFromFormData,
+  recipeScalars,
+  recipeTagsCreate,
+} from "@/lib/recipes";
 
 // État renvoyé au formulaire via useActionState (affichage des erreurs).
 export type FormState = { error: string | null };
@@ -17,7 +22,13 @@ export async function createRecipeAction(
     return { error: result.errors.join(" · ") };
   }
 
-  const recipe = await prisma.recipe.create({ data: result.data });
+  const recipe = await prisma.recipe.create({
+    data: {
+      ...recipeScalars(result.data),
+      ingredients: { create: ingredientsCreate(result.data) },
+      recipeTags: { create: recipeTagsCreate(result.data) },
+    },
+  });
 
   revalidatePath("/recipes");
   redirect(`/recipes/${recipe.id}`);
@@ -38,7 +49,14 @@ export async function updateRecipeAction(
     return { error: "Recette introuvable" };
   }
 
-  await prisma.recipe.update({ where: { id }, data: result.data });
+  await prisma.recipe.update({
+    where: { id },
+    data: {
+      ...recipeScalars(result.data),
+      ingredients: { deleteMany: {}, create: ingredientsCreate(result.data) },
+      recipeTags: { deleteMany: {}, create: recipeTagsCreate(result.data) },
+    },
+  });
 
   revalidatePath("/recipes");
   revalidatePath(`/recipes/${id}`);

@@ -19,9 +19,43 @@ model Recipe {
   servings    Int?
   prepTime    Int? // minutes
   cookTime    Int? // minutes
-  ingredients Json     @default("[]")
   steps       Json     @default("[]")
-  tags        String[] @default([])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  // Lignes d'ingrédients propres à la recette (one-to-many, cascade).
+  ingredients Ingredient[]
+  // Tags partagés (many-to-many via table de jonction explicite RecipeTag).
+  recipeTags  RecipeTag[]
+}
+
+// Une ligne d'ingrédient appartient à une seule recette (ex. "250 g de farine").
+model Ingredient {
+  id       String @id @default(cuid())
+  name     String
+  position Int    @default(0) // ordre d'affichage dans la recette
+
+  recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  recipeId String
+
+  @@index([recipeId])
+}
+
+// Un tag est réutilisable et partagé entre plusieurs recettes.
+model Tag {
+  id         String      @id @default(cuid())
+  name       String      @unique
+  recipeTags RecipeTag[]
+}
+
+// Table de jonction explicite de la relation many-to-many Recipe <-> Tag.
+// Table : "RecipeTag", colonnes : "recipeId" et "tagId" (clé primaire composite).
+model RecipeTag {
+  recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  recipeId String
+  tag      Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId    String
+
+  @@id([recipeId, tagId])
+  @@index([tagId])
 }

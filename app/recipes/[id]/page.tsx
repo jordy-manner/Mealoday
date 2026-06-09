@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { asLines } from "@/lib/recipes";
+import { asLines, withFlatTags } from "@/lib/recipes";
 import { deleteRecipeAction } from "../actions";
 
 type Props = { params: Promise<{ id: string }> };
@@ -24,13 +24,20 @@ function Meta({ label, value }: { label: string; value: number | null }) {
 
 export default async function RecipeDetailPage({ params }: Props) {
   const { id } = await params;
-  const recipe = await prisma.recipe.findUnique({ where: { id } });
+  const row = await prisma.recipe.findUnique({
+    where: { id },
+    include: {
+      ingredients: { orderBy: { position: "asc" } },
+      recipeTags: { include: { tag: true }, orderBy: { tag: { name: "asc" } } },
+    },
+  });
 
-  if (!recipe) {
+  if (!row) {
     notFound();
   }
 
-  const ingredients = asLines(recipe.ingredients);
+  const recipe = withFlatTags(row);
+  const ingredients = recipe.ingredients;
   const steps = asLines(recipe.steps);
 
   return (
@@ -69,10 +76,10 @@ export default async function RecipeDetailPage({ params }: Props) {
         <div className="mb-6 flex flex-wrap gap-2">
           {recipe.tags.map((tag) => (
             <span
-              key={tag}
+              key={tag.id}
               className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400"
             >
-              {tag}
+              {tag.name}
             </span>
           ))}
         </div>
@@ -88,8 +95,8 @@ export default async function RecipeDetailPage({ params }: Props) {
         <section className="mb-8">
           <h2 className="mb-3 text-lg font-semibold">Ingrédients</h2>
           <ul className="list-disc space-y-1 pl-5 text-zinc-700 dark:text-zinc-300">
-            {ingredients.map((item, i) => (
-              <li key={i}>{item}</li>
+            {ingredients.map((item) => (
+              <li key={item.id}>{item.name}</li>
             ))}
           </ul>
         </section>
