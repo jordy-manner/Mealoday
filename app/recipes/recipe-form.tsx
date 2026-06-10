@@ -26,6 +26,7 @@ import { TagsCombobox } from "./tags-combobox";
 import { StepEditor } from "./step-editor";
 
 type IngredientRow = { key: number; name: string; quantity: string; unit: string };
+type UtensilRow = { key: number; name: string; quantity: string };
 type StepRow = { key: number; value: string };
 
 export type RecipeFormValues = {
@@ -35,6 +36,7 @@ export type RecipeFormValues = {
   prepTime: string;
   cookTime: string;
   ingredients: { name: string; quantity: string; unit: string }[];
+  utensils: { name: string; quantity: string }[];
   steps: string[]; // une étape (Markdown) par élément
   tags: string[]; // tags sélectionnés
 };
@@ -46,6 +48,7 @@ const EMPTY: RecipeFormValues = {
   prepTime: "",
   cookTime: "",
   ingredients: [],
+  utensils: [],
   steps: [],
   tags: [],
 };
@@ -126,6 +129,7 @@ export function RecipeForm({
   submitLabel,
   ingredientOptions,
   unitOptions,
+  utensilOptions,
   tagOptions,
 }: {
   action: (prev: FormState, formData: FormData) => Promise<FormState>;
@@ -133,6 +137,7 @@ export function RecipeForm({
   submitLabel: string;
   ingredientOptions: string[];
   unitOptions: string[];
+  utensilOptions: string[];
   tagOptions: string[];
 }) {
   const [state, formAction] = useActionState(action, { error: null });
@@ -169,6 +174,30 @@ export function RecipeForm({
       const from = rs.findIndex((r) => r.key === active.id);
       const to = rs.findIndex((r) => r.key === over.id);
       return from === -1 || to === -1 ? rs : arrayMove(rs, from, to);
+    });
+  };
+
+  // Lignes d'ustensiles (nom + quantité), liste optionnelle (peut être vide).
+  const initialUtensils = defaultValues.utensils;
+  const utensilKey = useRef(initialUtensils.length);
+  const [utensils, setUtensils] = useState<UtensilRow[]>(
+    initialUtensils.map((u, i) => ({ key: i, ...u })),
+  );
+  const updateUtensil = (key: number, patch: Partial<UtensilRow>) =>
+    setUtensils((us) => us.map((u) => (u.key === key ? { ...u, ...patch } : u)));
+  const addUtensil = () =>
+    setUtensils((us) => [
+      ...us,
+      { key: utensilKey.current++, name: "", quantity: "" },
+    ]);
+  const removeUtensil = (key: number) =>
+    setUtensils((us) => us.filter((u) => u.key !== key));
+  const reorderUtensils = ({ active, over }: DragEndEvent) => {
+    if (!over || active.id === over.id) return;
+    setUtensils((us) => {
+      const from = us.findIndex((u) => u.key === active.id);
+      const to = us.findIndex((u) => u.key === over.id);
+      return from === -1 || to === -1 ? us : arrayMove(us, from, to);
     });
   };
 
@@ -322,6 +351,78 @@ export function RecipeForm({
         </datalist>
         <datalist id="unit-options">
           {unitOptions.map((o) => (
+            <option key={o} value={o} />
+          ))}
+        </datalist>
+      </div>
+
+      {/* Ustensiles : lignes dynamiques réordonnables (poignée · nom · quantité) */}
+      <div>
+        <span className={labelCls}>
+          Ustensiles <span className="text-zinc-500">(facultatif)</span>
+        </span>
+        <div className="flex flex-col gap-2">
+          {utensils.length > 0 && (
+            <div className="hidden gap-2 text-xs text-zinc-500 sm:flex">
+              <span className="w-6" />
+              <span className="flex-1">Ustensile</span>
+              <span className="w-24">Quantité</span>
+              <span className="w-8" />
+            </div>
+          )}
+
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            modifiers={[restrictToVerticalAxis]}
+            onDragEnd={reorderUtensils}
+          >
+            <SortableContext items={utensils.map((u) => u.key)} strategy={verticalListSortingStrategy}>
+              {utensils.map((row) => (
+                <SortableRow key={row.key} id={row.key} className="flex flex-wrap items-center gap-2">
+                  <input
+                    name="utensilName"
+                    list="utensil-options"
+                    placeholder="ex. moule à manqué 24 cm"
+                    value={row.name}
+                    onChange={(e) => updateUtensil(row.key, { name: e.target.value })}
+                    className={`${field} min-w-40 flex-1`}
+                    autoComplete="off"
+                  />
+                  <input
+                    name="utensilQuantity"
+                    type="number"
+                    step="1"
+                    min="0"
+                    placeholder="1"
+                    value={row.quantity}
+                    onChange={(e) => updateUtensil(row.key, { quantity: e.target.value })}
+                    className={`${field} w-24`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeUtensil(row.key)}
+                    aria-label="Supprimer cet ustensile"
+                    className="flex h-9 w-8 items-center justify-center rounded-md text-zinc-400 hover:bg-zinc-100 hover:text-red-600 dark:hover:bg-zinc-800"
+                  >
+                    ✕
+                  </button>
+                </SortableRow>
+              ))}
+            </SortableContext>
+          </DndContext>
+        </div>
+
+        <button
+          type="button"
+          onClick={addUtensil}
+          className="mt-2 text-sm font-medium text-zinc-700 hover:underline dark:text-zinc-300"
+        >
+          + Ajouter un ustensile
+        </button>
+
+        <datalist id="utensil-options">
+          {utensilOptions.map((o) => (
             <option key={o} value={o} />
           ))}
         </datalist>

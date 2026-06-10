@@ -5,6 +5,7 @@ import {
   recipeIngredientsCreate,
   recipeScalars,
   recipeTagsCreate,
+  recipeUtensilsCreate,
   validateRecipeInput,
 } from "@/lib/recipes";
 
@@ -14,6 +15,10 @@ type Params = { params: Promise<{ id: string }> };
 const withRelations = {
   recipeIngredients: {
     include: { ingredient: true, unit: true },
+    orderBy: { position: "asc" },
+  },
+  recipeUtensils: {
+    include: { utensil: true },
     orderBy: { position: "asc" },
   },
   recipeTags: { include: { tag: true }, orderBy: { tag: { name: "asc" } } },
@@ -62,6 +67,11 @@ export async function PUT(request: Request, { params }: Params) {
       recipeIngredients: {
         deleteMany: {},
         create: recipeIngredientsCreate(result.data),
+      },
+      // Remplace l'ensemble des lignes d'ustensiles de la recette.
+      recipeUtensils: {
+        deleteMany: {},
+        create: recipeUtensilsCreate(result.data),
       },
       // Remplace les liens de tags (les liens, pas les Tags eux-mêmes).
       recipeTags: { deleteMany: {}, create: recipeTagsCreate(result.data) },

@@ -12,6 +12,11 @@ export type IngredientInput = {
   unit: string | null;
 };
 
+export type UtensilInput = {
+  name: string;
+  quantity: number | null;
+};
+
 export type RecipeInput = {
   title: string;
   description: string | null;
@@ -19,6 +24,7 @@ export type RecipeInput = {
   prepTime: number | null;
   cookTime: number | null;
   ingredients: IngredientInput[];
+  utensils: UtensilInput[];
   steps: string[];
   tags: string[];
 };
@@ -116,6 +122,39 @@ function parseIngredients(value: unknown, errors: string[]): IngredientInput[] {
 }
 
 /**
+ * Normalise un tableau d'ustensiles bruts ([{ name, quantity }]).
+ * Les lignes sans nom sont ignorées ; une quantité fournie mais non entière
+ * (ou négative) ajoute une erreur.
+ */
+function parseUtensils(value: unknown, errors: string[]): UtensilInput[] {
+  if (!Array.isArray(value)) return [];
+  const result: UtensilInput[] = [];
+
+  for (const row of value) {
+    if (typeof row !== "object" || row === null) continue;
+    const r = row as Record<string, unknown>;
+
+    const name = typeof r.name === "string" ? r.name.trim() : "";
+    if (name.length === 0) continue; // ligne vide → ignorée
+
+    let quantity: number | null = null;
+    const rawQty = r.quantity;
+    if (rawQty !== null && rawQty !== undefined && rawQty !== "") {
+      const q = typeof rawQty === "number" ? rawQty : Number(String(rawQty).trim());
+      if (!Number.isInteger(q) || q < 0) {
+        errors.push(`Quantité invalide pour « ${name} »`);
+      } else {
+        quantity = q;
+      }
+    }
+
+    result.push({ name, quantity });
+  }
+
+  return result;
+}
+
+/**
  * Valide et normalise une entrée brute (corps JSON d'API ou FormData converti).
  */
 export function validateRecipeInput(raw: Record<string, unknown>): ValidationResult {
@@ -136,6 +175,7 @@ export function validateRecipeInput(raw: Record<string, unknown>): ValidationRes
   const cookTime = toOptionalInt(raw.cookTime, "Le temps de cuisson", errors);
 
   const ingredients = parseIngredients(raw.ingredients, errors);
+  const utensils = parseUtensils(raw.utensils, errors);
   const steps = parseSteps(raw.steps);
   const tags = splitTags(raw.tags);
 
@@ -145,7 +185,7 @@ export function validateRecipeInput(raw: Record<string, unknown>): ValidationRes
 
   return {
     ok: true,
-    data: { title, description, servings, prepTime, cookTime, ingredients, steps, tags },
+    data: { title, description, servings, prepTime, cookTime, ingredients, utensils, steps, tags },
   };
 }
 
@@ -165,6 +205,13 @@ export function recipeInputFromFormData(formData: FormData): ValidationResult {
     unit: units[i] ?? "",
   }));
 
+  const utensilNames = formData.getAll("utensilName");
+  const utensilQuantities = formData.getAll("utensilQuantity");
+  const utensils = utensilNames.map((name, i) => ({
+    name,
+    quantity: utensilQuantities[i] ?? "",
+  }));
+
   return validateRecipeInput({
     title: formData.get("title"),
     description: formData.get("description"),
@@ -172,6 +219,7 @@ export function recipeInputFromFormData(formData: FormData): ValidationResult {
     prepTime: formData.get("prepTime"),
     cookTime: formData.get("cookTime"),
     ingredients,
+    utensils,
     steps: formData.getAll("step"), // un textarea par étape (StepEditor)
     tags: formData.getAll("tag"), // un input hidden par tag (TagsCombobox)
   });
@@ -214,6 +262,21 @@ export function recipeIngredientsCreate(input: RecipeInput) {
 }
 
 /**
+ * Lignes de jonction RecipeUtensil à créer : pour chaque ustensile on crée le
+ * lien (avec quantité + position) et on connecte/crée l'Utensil par son `name`
+ * unique.
+ */
+export function recipeUtensilsCreate(input: RecipeInput) {
+  return input.utensils.map((ust, position) => ({
+    position,
+    quantity: ust.quantity,
+    utensil: {
+      connectOrCreate: { where: { name: ust.name }, create: { name: ust.name } },
+    },
+  }));
+}
+
+/**
  * Lignes de jonction RecipeTag à créer : pour chaque tag, on crée le lien et
  * on connecte (ou crée) le Tag par son `name` unique.
  */
@@ -231,18 +294,25 @@ type RawRecipeIngredient = {
   unit: { name: string } | null;
   position: number;
 };
+type RawRecipeUtensil = {
+  utensilId: string;
+  utensil: { name: string };
+  quantity: number | null;
+  position: number;
+};
 
 /**
- * Aplatit les relations `recipeTags` et `recipeIngredients` en formes
- * ergonomiques (`tags`, `ingredients`) pour l'API et les pages.
+ * Aplatit les relations `recipeTags`, `recipeIngredients` et `recipeUtensils` en
+ * formes ergonomiques (`tags`, `ingredients`, `utensils`) pour l'API et les pages.
  */
 export function flattenRecipe<
   T extends {
     recipeTags: RawRecipeTag[];
     recipeIngredients: RawRecipeIngredient[];
+    recipeUtensils: RawRecipeUtensil[];
   },
 >(recipe: T) {
-  const { recipeTags, recipeIngredients, ...rest } = recipe;
+  const { recipeTags, recipeIngredients, recipeUtensils, ...rest } = recipe;
   return {
     ...rest,
     tags: recipeTags.map((rt) => rt.tag),
@@ -252,6 +322,12 @@ export function flattenRecipe<
       quantity: ri.quantity,
       unit: ri.unit?.name ?? null,
       position: ri.position,
+    })),
+    utensils: recipeUtensils.map((ru) => ({
+      id: ru.utensilId,
+      name: ru.utensil.name,
+      quantity: ru.quantity,
+      position: ru.position,
     })),
   };
 }

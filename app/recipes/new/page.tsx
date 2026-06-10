@@ -9,9 +9,10 @@ export const metadata = { title: "Nouvelle recette" };
 export const dynamic = "force-dynamic";
 
 export default async function NewRecipePage() {
-  const [ingredients, units, tags] = await Promise.all([
+  const [ingredients, units, utensils, tags] = await Promise.all([
     prisma.ingredient.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
     prisma.unit.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
+    prisma.utensil.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
     prisma.tag.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
   ]);
 
@@ -26,6 +27,7 @@ export default async function NewRecipePage() {
         submitLabel="Créer la recette"
         ingredientOptions={ingredients.map((i) => i.name)}
         unitOptions={units.map((u) => u.name)}
+        utensilOptions={utensils.map((u) => u.name)}
         tagOptions={tags.map((t) => t.name)}
       />
     </main>

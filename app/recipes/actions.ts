@@ -8,6 +8,7 @@ import {
   recipeInputFromFormData,
   recipeScalars,
   recipeTagsCreate,
+  recipeUtensilsCreate,
 } from "@/lib/recipes";
 
 // État renvoyé au formulaire via useActionState (affichage des erreurs).
@@ -26,6 +27,7 @@ export async function createRecipeAction(
     data: {
       ...recipeScalars(result.data),
       recipeIngredients: { create: recipeIngredientsCreate(result.data) },
+      recipeUtensils: { create: recipeUtensilsCreate(result.data) },
       recipeTags: { create: recipeTagsCreate(result.data) },
     },
   });
@@ -56,6 +58,10 @@ export async function updateRecipeAction(
       recipeIngredients: {
         deleteMany: {},
         create: recipeIngredientsCreate(result.data),
+      },
+      recipeUtensils: {
+        deleteMany: {},
+        create: recipeUtensilsCreate(result.data),
       },
       recipeTags: { deleteMany: {}, create: recipeTagsCreate(result.data) },
     },

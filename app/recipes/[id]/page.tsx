@@ -33,6 +33,10 @@ export default async function RecipeDetailPage({ params }: Props) {
         include: { ingredient: true, unit: true },
         orderBy: { position: "asc" },
       },
+      recipeUtensils: {
+        include: { utensil: true },
+        orderBy: { position: "asc" },
+      },
       recipeTags: { include: { tag: true }, orderBy: { tag: { name: "asc" } } },
     },
   });
@@ -43,6 +47,7 @@ export default async function RecipeDetailPage({ params }: Props) {
 
   const recipe = flattenRecipe(row);
   const ingredients = recipe.ingredients;
+  const utensils = recipe.utensils;
   const steps = asLines(recipe.steps);
 
   return (
@@ -114,6 +119,22 @@ export default async function RecipeDetailPage({ params }: Props) {
                 </li>
               );
             })}
+          </ul>
+        </section>
+      )}
+
+      {utensils.length > 0 && (
+        <section className="mb-8">
+          <h2 className="mb-3 text-lg font-semibold">Ustensiles</h2>
+          <ul className="list-disc space-y-1 pl-5 text-zinc-700 dark:text-zinc-300">
+            {utensils.map((item) => (
+              <li key={item.id}>
+                {item.quantity !== null && item.quantity > 1 && (
+                  <span className="font-medium">{item.quantity} × </span>
+                )}
+                {item.name}
+              </li>
+            ))}
           </ul>
         </section>
       )}

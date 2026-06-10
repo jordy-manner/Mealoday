@@ -5,13 +5,19 @@ import {
   recipeIngredientsCreate,
   recipeScalars,
   recipeTagsCreate,
+  recipeUtensilsCreate,
   validateRecipeInput,
 } from "@/lib/recipes";
 
-// Inclut les relations : ingrédients (avec leur unité) ordonnés, tags triés.
+// Inclut les relations : ingrédients (avec leur unité) ordonnés, ustensiles
+// ordonnés, tags triés.
 const withRelations = {
   recipeIngredients: {
     include: { ingredient: true, unit: true },
+    orderBy: { position: "asc" },
+  },
+  recipeUtensils: {
+    include: { utensil: true },
     orderBy: { position: "asc" },
   },
   recipeTags: { include: { tag: true }, orderBy: { tag: { name: "asc" } } },
@@ -44,6 +50,7 @@ export async function POST(request: Request) {
     data: {
       ...recipeScalars(result.data),
       recipeIngredients: { create: recipeIngredientsCreate(result.data) },
+      recipeUtensils: { create: recipeUtensilsCreate(result.data) },
       recipeTags: { create: recipeTagsCreate(result.data) },
     },
     include: withRelations,

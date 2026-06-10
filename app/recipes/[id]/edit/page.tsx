@@ -11,7 +11,7 @@ export const metadata = { title: "Modifier la recette" };
 
 export default async function EditRecipePage({ params }: Props) {
   const { id } = await params;
-  const [row, ingredients, units, tags] = await Promise.all([
+  const [row, ingredients, units, utensils, tags] = await Promise.all([
     prisma.recipe.findUnique({
       where: { id },
       include: {
@@ -19,11 +19,16 @@ export default async function EditRecipePage({ params }: Props) {
           include: { ingredient: true, unit: true },
           orderBy: { position: "asc" },
         },
+        recipeUtensils: {
+          include: { utensil: true },
+          orderBy: { position: "asc" },
+        },
         recipeTags: { include: { tag: true }, orderBy: { tag: { name: "asc" } } },
       },
     }),
     prisma.ingredient.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
     prisma.unit.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
+    prisma.utensil.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
     prisma.tag.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
   ]);
 
@@ -47,6 +52,7 @@ export default async function EditRecipePage({ params }: Props) {
         submitLabel="Enregistrer"
         ingredientOptions={ingredients.map((i) => i.name)}
         unitOptions={units.map((u) => u.name)}
+        utensilOptions={utensils.map((u) => u.name)}
         tagOptions={tags.map((t) => t.name)}
         defaultValues={{
           title: recipe.title,
@@ -58,6 +64,10 @@ export default async function EditRecipePage({ params }: Props) {
             name: i.name,
             quantity: i.quantity?.toString() ?? "",
             unit: i.unit ?? "",
+          })),
+          utensils: recipe.utensils.map((u) => ({
+            name: u.name,
+            quantity: u.quantity?.toString() ?? "",
           })),
           steps: asLines(recipe.steps),
           tags: recipe.tags.map((t) => t.name),
