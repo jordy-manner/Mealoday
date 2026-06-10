@@ -5,6 +5,9 @@ import { RecipeForm } from "../recipe-form";
 
 export const metadata = { title: "Nouvelle recette" };
 
+// Catalogues (ingrédients/unités/tags) lus en DB → rendu à la demande.
+export const dynamic = "force-dynamic";
+
 export default async function NewRecipePage() {
   const [ingredients, units, tags] = await Promise.all([
     prisma.ingredient.findMany({ orderBy: { name: "asc" }, select: { name: true } }),

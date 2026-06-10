@@ -3,6 +3,9 @@ import { prisma } from "@/lib/prisma";
 
 export const metadata = { title: "Recettes" };
 
+// Données dépendantes de la DB → rendu à la demande (pas de prérendu statique au build).
+export const dynamic = "force-dynamic";
+
 export default async function RecipesPage() {
   const rows = await prisma.recipe.findMany({
     orderBy: { createdAt: "desc" },
