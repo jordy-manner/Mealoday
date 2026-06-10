@@ -35,14 +35,18 @@ export function asLines(value: unknown): string[] {
   return [];
 }
 
-/** Découpe un texte multi-lignes en tableau (vide ignoré). */
-function splitLines(value: unknown): string[] {
-  if (Array.isArray(value)) return asLines(value);
-  if (typeof value !== "string") return [];
-  return value
-    .split(/\r?\n/)
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0);
+/**
+ * Normalise les étapes : un tableau de chaînes Markdown (une par étape). Chaque
+ * étape est trimée (extrémités) — les retours à la ligne internes (Markdown) sont
+ * conservés. Une chaîne unique est tolérée en rétro-compat (une étape par ligne).
+ */
+function parseSteps(value: unknown): string[] {
+  const arr = Array.isArray(value)
+    ? value
+    : typeof value === "string"
+      ? value.split(/\r?\n/)
+      : [];
+  return arr.map((v) => String(v).trim()).filter((s) => s.length > 0);
 }
 
 /** Découpe une liste de tags séparés par des virgules (ou un tableau). */
@@ -132,7 +136,7 @@ export function validateRecipeInput(raw: Record<string, unknown>): ValidationRes
   const cookTime = toOptionalInt(raw.cookTime, "Le temps de cuisson", errors);
 
   const ingredients = parseIngredients(raw.ingredients, errors);
-  const steps = splitLines(raw.steps);
+  const steps = parseSteps(raw.steps);
   const tags = splitTags(raw.tags);
 
   if (errors.length > 0) {
@@ -168,7 +172,7 @@ export function recipeInputFromFormData(formData: FormData): ValidationResult {
     prepTime: formData.get("prepTime"),
     cookTime: formData.get("cookTime"),
     ingredients,
-    steps: formData.get("steps"),
+    steps: formData.getAll("step"), // un textarea par étape (StepEditor)
     tags: formData.getAll("tag"), // un input hidden par tag (TagsCombobox)
   });
 }

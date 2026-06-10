@@ -59,7 +59,7 @@ export default async function EditRecipePage({ params }: Props) {
             quantity: i.quantity?.toString() ?? "",
             unit: i.unit ?? "",
           })),
-          steps: asLines(recipe.steps).join("\n"),
+          steps: asLines(recipe.steps),
           tags: recipe.tags.map((t) => t.name),
         }}
       />

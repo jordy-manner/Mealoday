@@ -5,8 +5,10 @@ import { useActionState, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import type { FormState } from "./actions";
 import { TagsCombobox } from "./tags-combobox";
+import { StepEditor } from "./step-editor";
 
 type IngredientRow = { key: number; name: string; quantity: string; unit: string };
+type StepRow = { key: number; value: string };
 
 export type RecipeFormValues = {
   title: string;
@@ -15,7 +17,7 @@ export type RecipeFormValues = {
   prepTime: string;
   cookTime: string;
   ingredients: { name: string; quantity: string; unit: string }[];
-  steps: string; // une ligne par étape
+  steps: string[]; // une étape (Markdown) par élément
   tags: string[]; // tags sélectionnés
 };
 
@@ -26,7 +28,7 @@ const EMPTY: RecipeFormValues = {
   prepTime: "",
   cookTime: "",
   ingredients: [],
-  steps: "",
+  steps: [],
   tags: [],
 };
 
@@ -82,6 +84,21 @@ export function RecipeForm({
     ]);
   const removeRow = (key: number) =>
     setRows((rs) => (rs.length > 1 ? rs.filter((r) => r.key !== key) : rs));
+
+  // Lignes d'étapes (Markdown), au moins une visible.
+  const stepKey = useRef(0);
+  const [steps, setSteps] = useState<StepRow[]>(
+    (defaultValues.steps.length ? defaultValues.steps : [""]).map((value) => ({
+      key: stepKey.current++,
+      value,
+    })),
+  );
+  const updateStep = (key: number, value: string) =>
+    setSteps((ss) => ss.map((s) => (s.key === key ? { ...s, value } : s)));
+  const addStep = () =>
+    setSteps((ss) => [...ss, { key: stepKey.current++, value: "" }]);
+  const removeStep = (key: number) =>
+    setSteps((ss) => (ss.length > 1 ? ss.filter((s) => s.key !== key) : ss));
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
@@ -207,18 +224,40 @@ export function RecipeForm({
         </datalist>
       </div>
 
+      {/* Étapes : lignes dynamiques, chaque étape en Markdown (barre d'outils au focus) */}
       <div>
-        <label htmlFor="steps" className={labelCls}>
-          Étapes <span className="text-zinc-500">(une par ligne)</span>
-        </label>
-        <textarea
-          id="steps"
-          name="steps"
-          defaultValue={defaultValues.steps}
-          rows={6}
-          className={`${field} w-full`}
-          placeholder={"Mélanger la farine et les œufs\nLaisser reposer 30 min"}
-        />
+        <span className={labelCls}>
+          Étapes <span className="text-zinc-500">(Markdown · une étape par ligne)</span>
+        </span>
+        <ol className="flex list-decimal flex-col gap-2 pl-5 marker:text-zinc-400">
+          {steps.map((step, i) => (
+            <li key={step.key}>
+              <div className="flex items-start gap-2">
+                <StepEditor
+                  name="step"
+                  value={step.value}
+                  onChange={(value) => updateStep(step.key, value)}
+                  placeholder={`Étape ${i + 1}…`}
+                />
+                <button
+                  type="button"
+                  onClick={() => removeStep(step.key)}
+                  aria-label="Supprimer cette étape"
+                  className="flex h-9 w-8 items-center justify-center rounded-md text-zinc-400 hover:bg-zinc-100 hover:text-red-600 dark:hover:bg-zinc-800"
+                >
+                  ✕
+                </button>
+              </div>
+            </li>
+          ))}
+        </ol>
+        <button
+          type="button"
+          onClick={addStep}
+          className="mt-2 text-sm font-medium text-zinc-700 hover:underline dark:text-zinc-300"
+        >
+          + Ajouter une étape
+        </button>
       </div>
 
       <div>

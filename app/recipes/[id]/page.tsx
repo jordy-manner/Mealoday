@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { prisma } from "@/lib/prisma";
 import { asLines, flattenRecipe } from "@/lib/recipes";
 import { deleteRecipeAction } from "../actions";
@@ -121,7 +123,11 @@ export default async function RecipeDetailPage({ params }: Props) {
           <h2 className="mb-3 text-lg font-semibold">Étapes</h2>
           <ol className="list-decimal space-y-2 pl-5 text-zinc-700 dark:text-zinc-300">
             {steps.map((step, i) => (
-              <li key={i}>{step}</li>
+              <li key={i}>
+                <div className="[&_a]:underline [&_ul]:list-disc [&_ul]:pl-5 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{step}</ReactMarkdown>
+                </div>
+              </li>
             ))}
           </ol>
         </section>
