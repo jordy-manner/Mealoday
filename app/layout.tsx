@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Newsreader, Hanken_Grotesk, Spline_Sans_Mono } from "next/font/google";
 import "./globals.css";
 import { TopBar } from "./components/top-bar";
+import { MobileTabBar } from "./components/mobile-tab-bar";
 import { SiteFooter } from "./components/site-footer";
 
 // Display serif (titles/hero), with italic for accents like the hero word.
@@ -52,10 +53,15 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${newsreader.variable} ${hanken.variable} ${splineMono.variable} h-full`}
     >
-      <body className="flex min-h-full flex-col" suppressHydrationWarning>
+      {/* pb on mobile clears the fixed bottom tab bar (footer included). */}
+      <body
+        className="flex min-h-full flex-col pb-[76px] sm:pb-0"
+        suppressHydrationWarning
+      >
         <TopBar />
         <div className="flex-1">{children}</div>
         <SiteFooter />
+        <MobileTabBar />
       </body>
     </html>
   );

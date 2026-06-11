@@ -66,6 +66,41 @@ const paths: Record<string, ReactNode> = {
   ),
   grip: <path d="M4 6h16M4 12h16M4 18h16" />,
   menu: <path d="M3 6h18M3 12h18M3 18h18" />,
+  home: (
+    <>
+      <path d="M3 10.2 12 3l9 7.2" />
+      <path d="M5.5 9.3V20h13V9.3" />
+      <path d="M10 20v-5h4v5" />
+    </>
+  ),
+  book: (
+    <>
+      <path d="M12 6.5C10.4 5.1 8 4.5 4.5 4.5V18c3.5 0 5.9.6 7.5 2 1.6-1.4 4-2 7.5-2V4.5c-3.5 0-5.9.6-7.5 2Z" />
+      <path d="M12 6.5V20" />
+    </>
+  ),
+  cart: (
+    <>
+      <circle cx="9" cy="20" r="1.4" />
+      <circle cx="18" cy="20" r="1.4" />
+      <path d="M2.5 3.5H5l2.3 11.1a1.5 1.5 0 0 0 1.5 1.2h8.5a1.5 1.5 0 0 0 1.5-1.2L21.5 7H6" />
+    </>
+  ),
+  sliders: (
+    <>
+      <path d="M4 7h6M14 7h6M4 12h10M18 12h2M4 17h3M11 17h9" />
+      <circle cx="12" cy="7" r="2.2" />
+      <circle cx="16" cy="12" r="2.2" />
+      <circle cx="9" cy="17" r="2.2" />
+    </>
+  ),
+  dots: (
+    <>
+      <circle cx="5" cy="12" r="1.6" />
+      <circle cx="12" cy="12" r="1.6" />
+      <circle cx="19" cy="12" r="1.6" />
+    </>
+  ),
   tool: (
     <path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.7 2.7-2-2 2.7-2.7Z" />
   ),

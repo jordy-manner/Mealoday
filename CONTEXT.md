@@ -55,10 +55,22 @@ User-facing routes are **in French**; the REST API stays `/api/recipes`.
 - `/saisons/[slug]` — product detail: a full page that, when opened from `/saisons`,
   is shown as a **drawer** via parallel + intercepting routes (`@modal` slot +
   `@modal/(.)[slug]`). Direct visit / refresh / share renders the full page.
+- `/menu-semaine`, `/liste-courses`, `/favoris`, `/parametres` — secondary
+  destinations, currently **stub pages** ("Bientôt disponible", `ComingSoon`
+  component). Reached from the mobile "Plus" sheet. `/parametres` will host the
+  catalog editors (ingredients, utensils, units, categories, tags).
 - `GET/POST /api/recipes`, `GET/PUT/DELETE /api/recipes/[id]` — REST mirror.
 
 Shared list helpers (`cardInclude`, `toCard`, `MagazineGrid`, `SectionHead`,
 `EmptyState`, `CardRow`) live in `app/recettes/_shared.tsx`, used by both pages.
+
+**Navigation** is responsive. On **desktop** (≥ sm) the sticky `TopBar` holds the
+nav (Accueil / Recettes / Saisons), a search shortcut and the "Créer une recette"
+CTA. On **mobile** (< sm) the top bar collapses to logo + a search icon, and a
+fixed bottom **tab bar** (`MobileTabBar`, client) takes over: Accueil · Recettes ·
+**Créer** (raised center) · Saisons · **Plus**. "Plus" opens a bottom sheet with
+the secondary destinations. The `<body>` carries a bottom padding on mobile so the
+fixed bar never hides the footer/content.
 
 ## Architecture
 - **Reads** = Server Components querying Prisma directly (`export const dynamic = "force-dynamic"`).
@@ -89,7 +101,8 @@ Shared list helpers (`cardInclude`, `toCard`, `MagazineGrid`, `SectionHead`,
 - `app/recettes/` — `page.tsx` (list/search), `home-screen` (search UI), `recipe-detail`,
   `recipe-form` (+ `step-editor`, `tags-combobox`), `actions.ts`, `[slug]/`, `nouvelle/`.
 - `app/components/` — `icons`, `recipe-ui` (Photo/Tag/Difficulty/helpers), `recipe-card`
-  (Magazine card), `top-bar`, `site-footer`.
+  (Magazine card), `top-bar`, `mobile-tab-bar` (bottom nav + "Plus" sheet),
+  `coming-soon` (stub page), `site-footer`.
 - `app/layout.tsx` — fonts + TopBar + Footer. `app/globals.css` — design tokens.
 - `app/manifest.ts`, `app/icon.svg`, `app/apple-icon.png` — favicon / PWA icons.
 
