@@ -25,6 +25,7 @@ export type RecipeDetailData = {
   servings: number | null;
   prepTime: number | null;
   cookTime: number | null;
+  restTime: number | null;
   difficulty: number | null;
   rating: number | null;
   author: string | null;
@@ -77,7 +78,14 @@ export function RecipeDetail({
   const [done, setDone] = useState<Record<number, boolean>>({});
 
   const factor = serves / base;
-  const total = (recipe.prepTime ?? 0) + (recipe.cookTime ?? 0);
+  const total = (recipe.prepTime ?? 0) + (recipe.cookTime ?? 0) + (recipe.restTime ?? 0);
+  const timeSub = [
+    recipe.prepTime ? `Préparation ${recipe.prepTime} min` : null,
+    recipe.cookTime ? `Cuisson ${recipe.cookTime} min` : null,
+    recipe.restTime ? `Repos ${formatTime(recipe.restTime)}` : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
   const hasNutrition =
     recipe.kcal != null ||
     recipe.protein != null ||
@@ -141,7 +149,7 @@ export function RecipeDetail({
               <MetaCell
                 icon={<Icon name="clock" size={18} />}
                 value={formatTime(total)}
-                sub={`Préparation ${recipe.prepTime ?? 0} min · cuisson ${recipe.cookTime ?? 0} min`}
+                sub={timeSub}
               />
             )}
             {recipe.servings != null && (

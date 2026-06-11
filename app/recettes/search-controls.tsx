@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { Icon } from "../components/icons";
 
 const TIME_OPTIONS = [
@@ -16,49 +16,89 @@ const DIFF_OPTIONS = [
   { v: 3, l: "Difficile" },
 ];
 
+const DEBOUNCE_MS = 300;
+
 /**
  * Search/filter controls. They only read/write the URL (`/recettes?…`); the
- * actual filtering + results rendering happen server-side (page.tsx).
+ * filtering + results rendering happen server-side (page.tsx). The keyword
+ * search runs as you type (debounced, `router.replace`); Enter triggers it
+ * immediately. From the home, typing navigates to the catalogue, so the input
+ * re-focuses on mount (cursor at end) to keep typing seamless.
  */
 export function SearchControls({ categories }: { categories: string[] }) {
   const router = useRouter();
   const sp = useSearchParams();
+  const [isPending, startTransition] = useTransition();
 
   const q = sp.get("q") ?? "";
   const byIngredient = sp.get("ing") === "1";
   const cat = sp.get("cat");
   const maxTime = Number(sp.get("t") ?? "0");
   const diff = Number(sp.get("d") ?? "0");
-  const active = q.trim() !== "" || cat !== null || maxTime > 0 || diff > 0;
 
   const [text, setText] = useState(q);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   /** Builds the next URL from the current params with `changes` applied. */
-  function push(changes: Record<string, string | null>) {
-    const params = new URLSearchParams(sp.toString());
-    for (const [k, v] of Object.entries(changes)) {
-      if (v === null || v === "") params.delete(k);
-      else params.set(k, v);
+  const navigate = useCallback(
+    (changes: Record<string, string | null>, replace = false) => {
+      const params = new URLSearchParams(sp.toString());
+      for (const [k, v] of Object.entries(changes)) {
+        if (v === null || v === "") params.delete(k);
+        else params.set(k, v);
+      }
+      const qs = params.toString();
+      const url = qs ? `/recettes?${qs}` : "/recettes";
+      startTransition(() => {
+        if (replace) router.replace(url);
+        else router.push(url);
+      });
+    },
+    [sp, router],
+  );
+
+  // Search as you type: debounce, then replace the URL (no history spam).
+  useEffect(() => {
+    if (text.trim() === q) return;
+    const id = setTimeout(() => navigate({ q: text.trim() || null }, true), DEBOUNCE_MS);
+    return () => clearTimeout(id);
+  }, [text, q, navigate]);
+
+  // Keep the field in sync when the URL changes externally (reset link, back),
+  // but never overwrite what the user is actively typing.
+  useEffect(() => {
+    if (document.activeElement !== inputRef.current) setText(q);
+  }, [q]);
+
+  // Arriving with a query (e.g. from the home) → focus, cursor at end.
+  useEffect(() => {
+    if (q && inputRef.current) {
+      const el = inputRef.current;
+      el.focus();
+      el.setSelectionRange(el.value.length, el.value.length);
     }
-    const qs = params.toString();
-    router.push(qs ? `/recettes?${qs}` : "/recettes");
-  }
+    // mount only
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
       {/* Search block */}
-      <div className="flex max-w-content flex-col gap-3.5" style={{ maxWidth: 720 }}>
+      <div className="flex flex-col gap-3.5" style={{ maxWidth: 720 }}>
         <form
+          role="search"
           onSubmit={(e) => {
             e.preventDefault();
-            push({ q: text.trim() });
+            navigate({ q: text.trim() || null }, true);
           }}
           className="flex items-center gap-3 rounded-full border border-line bg-surface py-2 pl-[22px] pr-2 text-ink-faint shadow-card-lg transition focus-within:border-accent focus-within:shadow-[var(--shadow-card-lg),0_0_0_4px_var(--color-accent-soft)]"
         >
           <Icon name={byIngredient ? "leaf" : "search"} size={20} />
           <input
+            ref={inputRef}
             value={text}
             onChange={(e) => setText(e.target.value)}
+            aria-label="Rechercher une recette"
             placeholder={
               byIngredient
                 ? "tomate, pois chiches, citron…"
@@ -66,30 +106,31 @@ export function SearchControls({ categories }: { categories: string[] }) {
             }
             className="min-w-0 flex-1 bg-transparent py-2.5 text-[17px] text-ink outline-none placeholder:text-ink-faint"
           />
+          {isPending && (
+            <span
+              aria-hidden="true"
+              className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-line border-t-accent"
+            />
+          )}
           {text && (
             <button
               type="button"
               onClick={() => {
                 setText("");
-                push({ q: null });
+                navigate({ q: null }, true);
+                inputRef.current?.focus();
               }}
               aria-label="Effacer la recherche"
-              className="grid h-[30px] w-[30px] place-items-center rounded-full bg-surface-muted text-ink-soft transition hover:bg-line"
+              className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-full bg-surface-muted text-ink-soft transition hover:bg-line"
             >
               <Icon name="x" size={16} />
             </button>
           )}
-          <button
-            type="submit"
-            className="rounded-full bg-accent px-5 py-3 text-[15px] font-semibold text-white transition hover:bg-accent-deep active:translate-y-px"
-          >
-            Chercher
-          </button>
         </form>
 
         <button
           type="button"
-          onClick={() => push({ ing: byIngredient ? null : "1" })}
+          onClick={() => navigate({ ing: byIngredient ? null : "1" })}
           aria-pressed={byIngredient}
           className={`inline-flex items-center gap-2.5 self-start whitespace-nowrap rounded-full border px-[15px] py-2 text-[13.5px] font-semibold transition ${
             byIngredient
@@ -113,7 +154,7 @@ export function SearchControls({ categories }: { categories: string[] }) {
               <button
                 key={c}
                 type="button"
-                onClick={() => push({ cat: on ? null : c })}
+                onClick={() => navigate({ cat: on ? null : c })}
                 aria-pressed={on}
                 className={`whitespace-nowrap rounded-full border px-[18px] py-2.5 text-[14px] font-semibold transition ${
                   on
@@ -128,26 +169,24 @@ export function SearchControls({ categories }: { categories: string[] }) {
         </div>
       )}
 
-      {/* Filter bar */}
-      {active && (
-        <div className="mt-2 flex flex-wrap items-center gap-x-6 gap-y-3 rounded-card border border-line-soft bg-surface px-5 py-3.5 shadow-card">
-          <span className="inline-flex items-center gap-2 text-[14px] font-bold">
-            <Icon name="filter" size={16} /> Filtres
-          </span>
-          <FilterGroup
-            label="Temps"
-            options={TIME_OPTIONS}
-            value={maxTime}
-            onChange={(v) => push({ t: v ? String(v) : null })}
-          />
-          <FilterGroup
-            label="Difficulté"
-            options={DIFF_OPTIONS}
-            value={diff}
-            onChange={(v) => push({ d: v ? String(v) : null })}
-          />
-        </div>
-      )}
+      {/* Filter bar (always visible, on the home and the catalogue) */}
+      <div className="mt-2 flex flex-wrap items-center gap-x-6 gap-y-3 rounded-card border border-line-soft bg-surface px-5 py-3.5 shadow-card">
+        <span className="inline-flex items-center gap-2 text-[14px] font-bold">
+          <Icon name="filter" size={16} /> Filtres
+        </span>
+        <FilterGroup
+          label="Temps"
+          options={TIME_OPTIONS}
+          value={maxTime}
+          onChange={(v) => navigate({ t: v ? String(v) : null })}
+        />
+        <FilterGroup
+          label="Difficulté"
+          options={DIFF_OPTIONS}
+          value={diff}
+          onChange={(v) => navigate({ d: v ? String(v) : null })}
+        />
+      </div>
     </>
   );
 }

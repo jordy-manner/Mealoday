@@ -133,6 +133,7 @@ type SeedRecipe = {
   difficulty: number | null;
   prep: number | null;
   cook: number | null;
+  rest?: number | null;
   serves: number | null;
   kcal: number | null;
   protein: number | null;
@@ -452,6 +453,7 @@ const RECIPES: SeedRecipe[] = [
     difficulty: 1,
     prep: null,
     cook: null,
+    rest: 1560, // ~2h proofing + 24h+ cold rest
     serves: 6,
     kcal: null,
     protein: null,
@@ -508,6 +510,7 @@ async function main() {
         difficulty: r.difficulty,
         prepTime: r.prep,
         cookTime: r.cook,
+        restTime: r.rest ?? null,
         servings: r.serves,
         kcal: r.kcal,
         protein: r.protein,

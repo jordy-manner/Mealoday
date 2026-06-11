@@ -64,7 +64,9 @@ export async function searchRecipeIds(p: SearchParams): Promise<SearchHit[]> {
   }
   if (p.maxTime > 0) {
     const ph = add(p.maxTime);
-    conds.push(`(COALESCE(r."prepTime", 0) + COALESCE(r."cookTime", 0)) <= ${ph}`);
+    conds.push(
+      `(COALESCE(r."prepTime", 0) + COALESCE(r."cookTime", 0) + COALESCE(r."restTime", 0)) <= ${ph}`,
+    );
   }
   if (p.difficulty > 0) {
     const ph = add(p.difficulty);

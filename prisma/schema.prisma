@@ -20,6 +20,7 @@ model Recipe {
   servings    Int?
   prepTime    Int? // minutes
   cookTime    Int? // minutes
+  restTime    Int? // minutes (resting/proofing time)
   difficulty  Int? // 1 = easy, 2 = medium, 3 = hard
   rating      Float? // average rating out of 5
   author      String?

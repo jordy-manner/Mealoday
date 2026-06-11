@@ -77,6 +77,7 @@ export default async function EditRecipePage({ params }: Props) {
           servings: recipe.servings?.toString() ?? "",
           prepTime: recipe.prepTime?.toString() ?? "",
           cookTime: recipe.cookTime?.toString() ?? "",
+          restTime: recipe.restTime?.toString() ?? "",
           difficulty: recipe.difficulty,
           rating: recipe.rating?.toString() ?? "",
           author: recipe.author ?? "",

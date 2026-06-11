@@ -38,6 +38,7 @@ export type RecipeFormValues = {
   servings: string;
   prepTime: string;
   cookTime: string;
+  restTime: string;
   difficulty: number | null;
   rating: string;
   author: string;
@@ -60,6 +61,7 @@ const EMPTY: RecipeFormValues = {
   servings: "",
   prepTime: "",
   cookTime: "",
+  restTime: "",
   difficulty: null,
   rating: "",
   author: "",
@@ -225,6 +227,7 @@ export function RecipeForm({
     servings: defaultValues.servings,
     prepTime: defaultValues.prepTime,
     cookTime: defaultValues.cookTime,
+    restTime: defaultValues.restTime,
     difficulty: defaultValues.difficulty,
     rating: defaultValues.rating,
     author: defaultValues.author,
@@ -481,6 +484,18 @@ export function RecipeForm({
                   min="0"
                   value={f.cookTime}
                   onChange={(e) => set({ cookTime: e.target.value })}
+                  className={fieldCls}
+                />
+              </Field>
+            </div>
+            <div className="flex-1">
+              <Field label="Repos" hint="min">
+                <input
+                  name="restTime"
+                  type="number"
+                  min="0"
+                  value={f.restTime}
+                  onChange={(e) => set({ restTime: e.target.value })}
                   className={fieldCls}
                 />
               </Field>
@@ -775,7 +790,11 @@ export function RecipeForm({
             <div className="flex items-center gap-4 text-[13px] font-medium text-ink-faint">
               <span className="inline-flex items-center gap-1.5">
                 <Icon name="clock" size={14} />
-                {formatTime((Number(f.prepTime) || 0) + (Number(f.cookTime) || 0))}
+                {formatTime(
+                  (Number(f.prepTime) || 0) +
+                    (Number(f.cookTime) || 0) +
+                    (Number(f.restTime) || 0),
+                )}
               </span>
               {f.servings && (
                 <span className="inline-flex items-center gap-1.5">

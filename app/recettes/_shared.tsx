@@ -19,6 +19,7 @@ export type CardRow = {
   description: string | null;
   prepTime: number | null;
   cookTime: number | null;
+  restTime: number | null;
   servings: number | null;
   difficulty: number | null;
   rating: number | null;
@@ -36,6 +37,7 @@ export function toCard(r: CardRow): RecipeCardData {
     description: r.description,
     prepTime: r.prepTime,
     cookTime: r.cookTime,
+    restTime: r.restTime,
     servings: r.servings,
     difficulty: r.difficulty,
     rating: r.rating,

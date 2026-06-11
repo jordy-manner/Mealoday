@@ -12,13 +12,16 @@ export function hueFromString(str: string): number {
   return h % 360;
 }
 
-/** Formats a duration in minutes as "45 min" or "1 h 15". */
+/** Formats a duration in minutes as "45 min", "1 h 15", or "3 j" for long rests. */
 export function formatTime(min: number): string {
   if (!min) return "—";
   if (min < 60) return `${min} min`;
   const h = Math.floor(min / 60);
   const m = min % 60;
-  return m ? `${h} h ${m}` : `${h} h`;
+  if (h < 24) return m ? `${h} h ${m}` : `${h} h`;
+  const d = Math.floor(h / 24);
+  const hr = h % 24;
+  return hr ? `${d} j ${hr} h` : `${d} j`;
 }
 
 const VEG_TAGS = new Set(["Végé", "Végétarien", "Healthy", "Vegan"]);

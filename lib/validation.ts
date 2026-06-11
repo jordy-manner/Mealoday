@@ -91,6 +91,7 @@ export const recipeInputSchema = z.object({
   servings: intField("Le nombre de parts"),
   prepTime: intField("Le temps de préparation"),
   cookTime: intField("Le temps de cuisson"),
+  restTime: intField("Le temps de repos"),
   difficulty: intField("La difficulté", 3),
   rating: floatField("La note", 5),
   author: trimmedOrNull,

@@ -11,6 +11,7 @@ export type RecipeCardData = {
   description: string | null;
   prepTime: number | null;
   cookTime: number | null;
+  restTime: number | null;
   servings: number | null;
   difficulty: number | null;
   rating: number | null;
@@ -22,7 +23,7 @@ export type RecipeCardData = {
 const DIFF_LABELS: Record<number, string> = { 1: "Facile", 2: "Moyen", 3: "Difficile" };
 
 function MetaRow({ r }: { r: RecipeCardData }) {
-  const total = (r.prepTime ?? 0) + (r.cookTime ?? 0);
+  const total = (r.prepTime ?? 0) + (r.cookTime ?? 0) + (r.restTime ?? 0);
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[13px] font-medium text-ink-faint">
       {total > 0 && (

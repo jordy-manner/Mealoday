@@ -2,6 +2,12 @@
 
 All notable changes to the project, by release. Versions follow the `vMAJOR.MINOR.PATCH` format; each release maps to a git tag and a Vercel Preview/Production deployment.
 
+## [v0.2.4] — 2026-06-11
+
+- Search runs **as you type** (debounced 300 ms, `router.replace`): removed the "Chercher" button; Enter still triggers immediately; a small spinner shows during the server fetch; the field re-focuses after the home → catalogue jump.
+- Filters (time / difficulty) and category chips are now **always visible** (home + catalogue), no longer gated behind an active search.
+- New **resting time** field (`restTime`, minutes): editable in the form, shown in the recipe meta and on the cards, and **counted in the total time and the time filter**. `formatTime` now renders days for long rests (e.g. "3 j"). Seeded the "Pâte à Pizza" with a ~26 h rest.
+
 ## [v0.2.3] — 2026-06-11
 
 - Split the lean home (`/`) from the catalogue (`/recettes`). The home is a landing page: hero + search + a single featured section ("Populaires cette semaine", or the 4 latest as a fallback) with a "Tout voir →" link to the catalogue. `/recettes` is now the full catalogue (compact header + complete list / server-side search).

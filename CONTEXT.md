@@ -26,7 +26,8 @@ recipes. UI is in **French**; code is in **English**.
 All many-to-many relations use **explicit join tables** (project convention).
 
 - **Recipe** — `id`, `slug` (unique, URL key), `title`, `description?`, `servings?`,
-  `prepTime?`, `cookTime?` (minutes), `difficulty?` (1–3), `rating?` (0–5), `author?`,
+  `prepTime?`, `cookTime?`, `restTime?` (minutes; total time = prep + cook + rest),
+  `difficulty?` (1–3), `rating?` (0–5), `author?`,
   `popular` (bool), nutrition `kcal?/protein?/carbs?/fat?` (per serving),
   `imageUrl?` + `imagePublicId?` (Cloudinary), `createdAt`, `updatedAt`.
 - **Step** — ordered prep steps: `content` (Markdown) + `order`, FK to Recipe.
@@ -58,8 +59,9 @@ Shared list helpers (`cardInclude`, `toCard`, `MagazineGrid`, `SectionHead`,
 - **Reads** = Server Components querying Prisma directly (`export const dynamic = "force-dynamic"`).
 - **Search** is done **server-side** via `searchParams` + Prisma (keyword, by-ingredient
   scoring, category/time/difficulty filters); accent-insensitive thanks to the Postgres
-  `unaccent` extension. The interactive controls are a small Client Component that pushes
-  to the URL; results render on the server.
+  `unaccent` extension. The interactive controls are a small Client Component that updates
+  the URL; results render on the server. The keyword search runs **as you type** (debounced,
+  `router.replace`, no submit button); filters and category chips are always visible.
 - **Writes** = typed **Server Actions** (`app/recettes/actions.ts`) validated with Zod
   (`lib/validation.ts`), then `revalidatePath`. Slugs are generated from the title and
   made unique (`slugify` + collision suffix).
