@@ -1,23 +1,23 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { asLines, flattenRecipe } from "@/lib/recipes";
+import { flattenRecipe } from "@/lib/recipes";
 import type { RecipeCardData } from "../../components/recipe-card";
 import { RecipeDetail } from "../recipe-detail";
 
-type Props = { params: Promise<{ id: string }> };
+type Props = { params: Promise<{ slug: string }> };
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: Props) {
-  const { id } = await params;
-  const recipe = await prisma.recipe.findUnique({ where: { id } });
+  const { slug } = await params;
+  const recipe = await prisma.recipe.findUnique({ where: { slug } });
   return { title: recipe?.title ?? "Recette introuvable" };
 }
 
 export default async function RecipeDetailPage({ params }: Props) {
-  const { id } = await params;
+  const { slug } = await params;
   const row = await prisma.recipe.findUnique({
-    where: { id },
+    where: { slug },
     include: {
       recipeIngredients: {
         include: { ingredient: true, unit: true },
@@ -32,6 +32,7 @@ export default async function RecipeDetailPage({ params }: Props) {
         include: { category: true },
         orderBy: { position: "asc" },
       },
+      recipeSteps: { orderBy: { order: "asc" } },
     },
   });
 
@@ -46,7 +47,7 @@ export default async function RecipeDetailPage({ params }: Props) {
   const relatedRows = categoryIds.length
     ? await prisma.recipe.findMany({
         where: {
-          id: { not: id },
+          id: { not: row.id },
           recipeCategories: { some: { categoryId: { in: categoryIds } } },
         },
         orderBy: { createdAt: "desc" },
@@ -63,6 +64,7 @@ export default async function RecipeDetailPage({ params }: Props) {
 
   const related: RecipeCardData[] = relatedRows.map((r) => ({
     id: r.id,
+    slug: r.slug,
     title: r.title,
     description: r.description,
     prepTime: r.prepTime,
@@ -77,6 +79,7 @@ export default async function RecipeDetailPage({ params }: Props) {
 
   const recipe = {
     id: flat.id,
+    slug: flat.slug,
     title: flat.title,
     description: flat.description,
     servings: flat.servings,
@@ -98,7 +101,7 @@ export default async function RecipeDetailPage({ params }: Props) {
       unit: i.unit,
     })),
     utensils: flat.utensils.map((u) => ({ name: u.name, quantity: u.quantity })),
-    steps: asLines(flat.steps),
+    steps: flat.steps,
   };
 
   return <RecipeDetail recipe={recipe} related={related} />;

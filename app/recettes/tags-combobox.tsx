@@ -60,7 +60,7 @@ export function TagsCombobox({
       ))}
 
       <Combobox multiple value={selected} onChange={handleChange} immediate>
-        <div className="flex flex-wrap items-center gap-2 rounded-field border border-line bg-surface px-2.5 py-2 focus-within:border-accent focus-within:shadow-[0_0_0_3px_var(--color-accent-soft)]">
+        <div className="flex flex-wrap items-center gap-2 rounded-input border border-line bg-surface px-2.5 py-2 focus-within:border-accent focus-within:shadow-[0_0_0_3px_var(--color-accent-soft)]">
           {selected.map((tag) => (
             <span
               key={tag}
@@ -88,13 +88,13 @@ export function TagsCombobox({
 
         <ComboboxOptions
           anchor="bottom start"
-          className="z-10 mt-1 w-[var(--input-width)] rounded-field border border-line bg-surface py-1 shadow-pop empty:invisible"
+          className="z-10 mt-1 w-[var(--input-width)] rounded-input border border-line bg-surface py-1 shadow-card-lg empty:invisible"
         >
           {filtered.map((o) => (
             <ComboboxOption
               key={o}
               value={o}
-              className="cursor-pointer px-3 py-1.5 text-[14px] text-ink-soft data-[focus]:bg-surface-2"
+              className="cursor-pointer px-3 py-1.5 text-[14px] text-ink-soft data-[focus]:bg-surface-muted"
             >
               {o}
             </ComboboxOption>
@@ -102,7 +102,7 @@ export function TagsCombobox({
           {canCreate && (
             <ComboboxOption
               value={q}
-              className="cursor-pointer px-3 py-1.5 text-[14px] text-ink-soft data-[focus]:bg-surface-2"
+              className="cursor-pointer px-3 py-1.5 text-[14px] text-ink-soft data-[focus]:bg-surface-muted"
             >
               Créer « <span className="font-semibold">{q}</span> »
             </ComboboxOption>

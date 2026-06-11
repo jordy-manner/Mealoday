@@ -2,22 +2,22 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getMediaStore } from "@/lib/media";
-import { asLines, flattenRecipe } from "@/lib/recipes";
+import { flattenRecipe } from "@/lib/recipes";
 import { Icon } from "../../../components/icons";
 import { updateRecipeAction } from "../../actions";
 import { RecipeForm } from "../../recipe-form";
 
-type Props = { params: Promise<{ id: string }> };
+type Props = { params: Promise<{ slug: string }> };
 
 export const metadata = { title: "Modifier la recette" };
 
 export const dynamic = "force-dynamic";
 
 export default async function EditRecipePage({ params }: Props) {
-  const { id } = await params;
+  const { slug } = await params;
   const [row, ingredients, units, utensils, tags, categories] = await Promise.all([
     prisma.recipe.findUnique({
-      where: { id },
+      where: { slug },
       include: {
         recipeIngredients: {
           include: { ingredient: true, unit: true },
@@ -32,6 +32,7 @@ export default async function EditRecipePage({ params }: Props) {
           include: { category: true },
           orderBy: { position: "asc" },
         },
+        recipeSteps: { orderBy: { order: "asc" } },
       },
     }),
     prisma.ingredient.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
@@ -51,9 +52,9 @@ export default async function EditRecipePage({ params }: Props) {
   const action = updateRecipeAction.bind(null, recipe.id);
 
   return (
-    <main className="mx-auto w-full max-w-[1180px] animate-fade-up px-[18px] pb-20 pt-7 sm:px-8">
+    <main className="mx-auto w-full max-w-content animate-fade-up px-[18px] pb-20 pt-7 sm:px-8">
       <Link
-        href={`/recipes/${recipe.id}`}
+        href={`/recettes/${recipe.slug}`}
         className="inline-flex items-center gap-2 py-1.5 text-[15px] font-semibold text-ink-soft transition hover:text-accent"
       >
         <Icon name="back" size={18} /> Retour à la recette
@@ -94,7 +95,7 @@ export default async function EditRecipePage({ params }: Props) {
             name: u.name,
             quantity: u.quantity?.toString() ?? "",
           })),
-          steps: asLines(recipe.steps),
+          steps: recipe.steps,
           tags: recipe.tags.map((t) => t.name),
           categories: recipe.categories.map((c) => c.name),
         }}

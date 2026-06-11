@@ -2,43 +2,47 @@
 
 /*
  * Design system — frozen variant "Gourmand Arrondi · Terracotta · Magazine".
- * Tokens are exposed to Tailwind v4 via @theme, so they generate utilities
- * (bg-bg, text-ink-soft, bg-accent-soft, rounded-card, shadow-pop, font-display…).
- * Fonts come from next/font (see app/layout.tsx) through the --font-* variables.
+ * Token names mirror the official handoff theme (tailwind/theme.v4.css), so
+ * they generate the documented utilities (bg-surface-muted, text-veg,
+ * rounded-input, rounded-card, shadow-card, shadow-card-lg, max-w-content…).
+ * Fonts come from next/font (app/layout.tsx) via the --font-* variables.
  */
 @theme {
-  /* Colors (oklch) */
-  --color-bg: oklch(0.97 0.018 60);
-  --color-surface: oklch(0.995 0.008 70);
-  --color-surface-2: oklch(0.95 0.022 58);
-  --color-ink: oklch(0.24 0.018 48);
-  --color-ink-soft: oklch(0.47 0.022 46);
-  --color-ink-faint: oklch(0.62 0.02 50);
-  --color-line: oklch(0.9 0.013 68);
-  --color-line-soft: oklch(0.93 0.01 70);
-  --color-accent: oklch(0.62 0.17 38);
-  --color-accent-deep: oklch(0.5 0.15 36);
-  --color-accent-soft: oklch(0.93 0.05 50);
-  --color-accent-ink: oklch(0.42 0.13 38);
-  --color-green: oklch(0.58 0.1 150);
-  --color-green-soft: oklch(0.93 0.04 150);
-  --color-green-ink: oklch(0.42 0.1 150);
+  /* Colors */
+  --color-bg: #fff3e9;
+  --color-surface: #fffdf8;
+  --color-surface-muted: #faebe0;
 
-  /* Typography */
-  --font-display: var(--font-newsreader), ui-serif, Georgia, serif;
-  --font-sans: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-spline-mono), ui-monospace, "SFMono-Regular", monospace;
+  --color-ink: #271d18;
+  --color-ink-soft: #665751;
+  --color-ink-faint: #91837c;
+
+  --color-line: #e4ddd5;
+  --color-line-soft: #ece7e1;
+
+  --color-accent: #d8582e;
+  --color-accent-deep: #a73a1b;
+  --color-accent-soft: #ffdfcb;
+  --color-accent-ink: #852b09;
+
+  --color-veg: #4b8b5a;
+  --color-veg-soft: #d6f0da;
+
+  /* Typography (next/font variables, with literal fallbacks) */
+  --font-display: var(--font-newsreader), "Newsreader", Georgia, serif;
+  --font-sans: var(--font-hanken), "Hanken Grotesk", system-ui, sans-serif;
+  --font-mono: var(--font-spline-mono), "Spline Sans Mono", ui-monospace, monospace;
 
   /* Radii (Gourmand Arrondi) */
+  --radius-input: 14px;
   --radius-card: 22px;
-  --radius-field: 14px;
 
   /* Shadows */
-  --shadow-soft: 0 1px 2px oklch(0.4 0.03 50 / 0.06), 0 2px 8px oklch(0.4 0.03 50 / 0.05);
-  --shadow-pop: 0 4px 14px oklch(0.4 0.03 50 / 0.08), 0 12px 34px oklch(0.4 0.03 50 / 0.07);
+  --shadow-card: 0 1px 2px rgb(64 48 40 / 0.06), 0 2px 8px rgb(64 48 40 / 0.05);
+  --shadow-card-lg: 0 4px 14px rgb(64 48 40 / 0.08), 0 12px 34px rgb(64 48 40 / 0.07);
 
-  /* Layout */
-  --spacing-maxw: 1180px;
+  /* Content width → max-w-content */
+  --container-content: 1180px;
 
   /* Animations */
   --animate-fade-up: fade-up 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
@@ -85,7 +89,7 @@ body {
  * weave on top. Used wherever a recipe has no real image yet.
  */
 .photo-ph {
-  background: var(--ph-bg, var(--color-surface-2));
+  background: var(--ph-bg, var(--color-surface-muted));
 }
 .photo-ph::after {
   content: "";

@@ -14,6 +14,7 @@ datasource db {
 
 model Recipe {
   id          String   @id @default(cuid())
+  slug        String   @unique // URL-friendly identifier derived from the title
   title       String
   description String?
   servings    Int?
@@ -23,7 +24,6 @@ model Recipe {
   rating      Float? // average rating out of 5
   author      String?
   popular     Boolean  @default(false) // featured in the "popular" section
-  steps       Json     @default("[]")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -50,6 +50,19 @@ model Recipe {
   // Categories of the recipe (many-to-many via the explicit RecipeCategory
   // join). A recipe can belong to several categories.
   recipeCategories  RecipeCategory[]
+  // Ordered preparation steps (own table rather than a Json column).
+  recipeSteps       Step[]
+}
+
+// A single ordered preparation step of a recipe (Markdown content).
+model Step {
+  id       String @id @default(cuid())
+  recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  recipeId String
+  content  String
+  order    Int    @default(0) // display order within the recipe
+
+  @@index([recipeId])
 }
 
 // Catalog of reusable ingredients (e.g. "farine", "œuf"). Unique name.

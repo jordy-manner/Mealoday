@@ -1,268 +1,48 @@
-// Types and validation shared between the API Routes and the Server Actions.
+// Shapes and Prisma-write helpers shared between the API Routes and the Server
+// Actions. Input validation lives in lib/validation.ts (Zod).
 //
 // Modeling:
-// - ingredients: many-to-many relation via RecipeIngredient (ingredient name +
-//   quantity + unit). Ingredient and Unit are catalogs (unique name).
-// - steps: Json column (array of strings, one per step).
-// - tags: many-to-many via RecipeTag.
+// - ingredients: many-to-many via RecipeIngredient (ingredient name + quantity
+//   + unit). Ingredient and Unit are catalogs (unique name).
+// - steps: own Step table (content + order).
+// - tags / categories: many-to-many via RecipeTag / RecipeCategory.
 
-export type IngredientInput = {
-  name: string;
-  quantity: number | null;
-  unit: string | null;
-};
+import {
+  validateRecipeInput,
+  type IngredientInput,
+  type RecipeInput,
+  type UtensilInput,
+  type ValidationResult,
+} from "./validation";
 
-export type UtensilInput = {
-  name: string;
-  quantity: number | null;
-};
+export type { IngredientInput, RecipeInput, UtensilInput, ValidationResult };
+export { validateRecipeInput };
 
-export type RecipeInput = {
-  title: string;
-  description: string | null;
-  servings: number | null;
-  prepTime: number | null;
-  cookTime: number | null;
-  difficulty: number | null;
-  rating: number | null;
-  author: string | null;
-  popular: boolean;
-  kcal: number | null;
-  protein: number | null;
-  carbs: number | null;
-  fat: number | null;
-  ingredients: IngredientInput[];
-  utensils: UtensilInput[];
-  steps: string[];
-  tags: string[];
-  categories: string[];
-};
-
-export type ValidationResult =
-  | { ok: true; data: RecipeInput }
-  | { ok: false; errors: string[] };
-
-/** Reads an unknown Json value as an array of strings (for rendering steps). */
-export function asLines(value: unknown): string[] {
-  if (Array.isArray(value)) {
-    return value.map((v) => String(v)).filter((s) => s.trim().length > 0);
-  }
-  return [];
+/** URL-friendly slug from a title (accent-stripped, lowercased, dash-joined). */
+export function slugify(value: string): string {
+  return (
+    value
+      .normalize("NFD")
+      .replace(/\p{Diacritic}/gu, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-+|-+$)/g, "")
+      .slice(0, 80) || "recette"
+  );
 }
 
 /**
- * Normalizes the steps: an array of Markdown strings (one per step). Each step
- * is trimmed (at both ends) — internal line breaks (Markdown) are preserved. A
- * single string is tolerated for backward compatibility (one step per line).
- */
-function parseSteps(value: unknown): string[] {
-  const arr = Array.isArray(value)
-    ? value
-    : typeof value === "string"
-      ? value.split(/\r?\n/)
-      : [];
-  return arr.map((v) => String(v).trim()).filter((s) => s.length > 0);
-}
-
-/** Splits a comma-separated list of tags (or an array). */
-function splitTags(value: unknown): string[] {
-  if (Array.isArray(value)) return asLines(value);
-  if (typeof value !== "string") return [];
-  return value
-    .split(",")
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0);
-}
-
-/**
- * Optional positive integer; reports an error if provided but invalid. An
- * optional `max` bounds the value (used e.g. for difficulty 1–3).
- */
-function toOptionalInt(
-  value: unknown,
-  field: string,
-  errors: string[],
-  max?: number,
-): number | null {
-  if (value === null || value === undefined || value === "") return null;
-  const n = typeof value === "number" ? value : Number(String(value).trim());
-  if (!Number.isInteger(n) || n < 0 || (max !== undefined && n > max)) {
-    errors.push(`${field} est invalide`);
-    return null;
-  }
-  return n;
-}
-
-/** Optional non-negative float within [0, max]; reports an error if invalid. */
-function toOptionalFloat(
-  value: unknown,
-  field: string,
-  errors: string[],
-  max: number,
-): number | null {
-  if (value === null || value === undefined || value === "") return null;
-  const n =
-    typeof value === "number" ? value : Number(String(value).replace(",", ".").trim());
-  if (!Number.isFinite(n) || n < 0 || n > max) {
-    errors.push(`${field} est invalide`);
-    return null;
-  }
-  return n;
-}
-
-/** Optional non-empty trimmed string, else null. */
-function toOptionalString(value: unknown): string | null {
-  return typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
-}
-
-/**
- * Normalizes an array of raw ingredients ([{ name, quantity, unit }]).
- * Rows without a name are ignored; a quantity that is provided but not numeric
- * (or negative) adds an error. The French decimal comma is tolerated.
- */
-function parseIngredients(value: unknown, errors: string[]): IngredientInput[] {
-  if (!Array.isArray(value)) return [];
-  const result: IngredientInput[] = [];
-
-  for (const row of value) {
-    if (typeof row !== "object" || row === null) continue;
-    const r = row as Record<string, unknown>;
-
-    const name = typeof r.name === "string" ? r.name.trim() : "";
-    if (name.length === 0) continue; // empty row → ignored
-
-    let quantity: number | null = null;
-    const rawQty = r.quantity;
-    if (rawQty !== null && rawQty !== undefined && rawQty !== "") {
-      const q =
-        typeof rawQty === "number"
-          ? rawQty
-          : Number(String(rawQty).replace(",", ".").trim());
-      if (!Number.isFinite(q) || q < 0) {
-        errors.push(`Quantité invalide pour « ${name} »`);
-      } else {
-        quantity = q;
-      }
-    }
-
-    const unit =
-      typeof r.unit === "string" && r.unit.trim().length > 0
-        ? r.unit.trim()
-        : null;
-
-    result.push({ name, quantity, unit });
-  }
-
-  return result;
-}
-
-/**
- * Normalizes an array of raw utensils ([{ name, quantity }]).
- * Rows without a name are ignored; a quantity that is provided but not an
- * integer (or negative) adds an error.
- */
-function parseUtensils(value: unknown, errors: string[]): UtensilInput[] {
-  if (!Array.isArray(value)) return [];
-  const result: UtensilInput[] = [];
-
-  for (const row of value) {
-    if (typeof row !== "object" || row === null) continue;
-    const r = row as Record<string, unknown>;
-
-    const name = typeof r.name === "string" ? r.name.trim() : "";
-    if (name.length === 0) continue; // empty row → ignored
-
-    let quantity: number | null = null;
-    const rawQty = r.quantity;
-    if (rawQty !== null && rawQty !== undefined && rawQty !== "") {
-      const q = typeof rawQty === "number" ? rawQty : Number(String(rawQty).trim());
-      if (!Number.isInteger(q) || q < 0) {
-        errors.push(`Quantité invalide pour « ${name} »`);
-      } else {
-        quantity = q;
-      }
-    }
-
-    result.push({ name, quantity });
-  }
-
-  return result;
-}
-
-/**
- * Validates and normalizes a raw input (API JSON body or converted FormData).
- */
-export function validateRecipeInput(raw: Record<string, unknown>): ValidationResult {
-  const errors: string[] = [];
-
-  const title = typeof raw.title === "string" ? raw.title.trim() : "";
-  if (title.length === 0) {
-    errors.push("Le titre est obligatoire");
-  }
-
-  const description = toOptionalString(raw.description);
-
-  const servings = toOptionalInt(raw.servings, "Le nombre de parts", errors);
-  const prepTime = toOptionalInt(raw.prepTime, "Le temps de préparation", errors);
-  const cookTime = toOptionalInt(raw.cookTime, "Le temps de cuisson", errors);
-  const difficulty = toOptionalInt(raw.difficulty, "La difficulté", errors, 3);
-  const rating = toOptionalFloat(raw.rating, "La note", errors, 5);
-  const author = toOptionalString(raw.author);
-  const popular = raw.popular === true || raw.popular === "true" || raw.popular === "on";
-  const kcal = toOptionalInt(raw.kcal, "Les calories", errors);
-  const protein = toOptionalInt(raw.protein, "Les protéines", errors);
-  const carbs = toOptionalInt(raw.carbs, "Les glucides", errors);
-  const fat = toOptionalInt(raw.fat, "Les lipides", errors);
-
-  const ingredients = parseIngredients(raw.ingredients, errors);
-  const utensils = parseUtensils(raw.utensils, errors);
-  const steps = parseSteps(raw.steps);
-  const tags = splitTags(raw.tags);
-  const categories = splitTags(raw.categories);
-
-  if (errors.length > 0) {
-    return { ok: false, errors };
-  }
-
-  return {
-    ok: true,
-    data: {
-      title,
-      description,
-      servings,
-      prepTime,
-      cookTime,
-      difficulty,
-      rating,
-      author,
-      popular,
-      kcal,
-      protein,
-      carbs,
-      fat,
-      ingredients,
-      utensils,
-      steps,
-      tags,
-      categories,
-    },
-  };
-}
-
-/**
- * Extracts the fields from a FormData. Ingredient rows are sent as parallel
- * arrays (ingredientName / ingredientQuantity / ingredientUnit), recombined row
- * by row.
+ * Extracts the fields from a FormData and validates them. Ingredient/utensil
+ * rows are sent as parallel arrays, recombined row by row before validation.
  */
 export function recipeInputFromFormData(formData: FormData): ValidationResult {
-  const names = formData.getAll("ingredientName");
-  const quantities = formData.getAll("ingredientQuantity");
-  const units = formData.getAll("ingredientUnit");
-
-  const ingredients = names.map((name, i) => ({
+  const ingredientNames = formData.getAll("ingredientName");
+  const ingredientQuantities = formData.getAll("ingredientQuantity");
+  const ingredientUnits = formData.getAll("ingredientUnit");
+  const ingredients = ingredientNames.map((name, i) => ({
     name,
-    quantity: quantities[i] ?? "",
-    unit: units[i] ?? "",
+    quantity: ingredientQuantities[i] ?? "",
+    unit: ingredientUnits[i] ?? "",
   }));
 
   const utensilNames = formData.getAll("utensilName");
@@ -296,7 +76,7 @@ export function recipeInputFromFormData(formData: FormData): ValidationResult {
 
 // --- Helpers for Prisma writes (plain objects, without importing Prisma) ---
 
-/** Scalar fields of Recipe (steps stays a Json column). */
+/** Scalar fields of Recipe (steps now live in their own table). */
 export function recipeScalars(input: RecipeInput) {
   return {
     title: input.title,
@@ -312,8 +92,12 @@ export function recipeScalars(input: RecipeInput) {
     protein: input.protein,
     carbs: input.carbs,
     fat: input.fat,
-    steps: input.steps,
   };
+}
+
+/** Step rows to create (content + order). */
+export function recipeStepsCreate(input: RecipeInput) {
+  return input.steps.map((content, order) => ({ content, order }));
 }
 
 /**
@@ -388,11 +172,11 @@ type RawRecipeUtensil = {
   quantity: number | null;
   position: number;
 };
+type RawStep = { content: string; order: number };
 
 /**
- * Flattens the `recipeTags`, `recipeIngredients` and `recipeUtensils` relations
- * into ergonomic shapes (`tags`, `ingredients`, `utensils`) for the API and the
- * pages.
+ * Flattens the relations into ergonomic shapes (`tags`, `categories`,
+ * `ingredients`, `utensils`, `steps`) for the API and the pages.
  */
 export function flattenRecipe<
   T extends {
@@ -400,10 +184,17 @@ export function flattenRecipe<
     recipeCategories: RawRecipeCategory[];
     recipeIngredients: RawRecipeIngredient[];
     recipeUtensils: RawRecipeUtensil[];
+    recipeSteps: RawStep[];
   },
 >(recipe: T) {
-  const { recipeTags, recipeCategories, recipeIngredients, recipeUtensils, ...rest } =
-    recipe;
+  const {
+    recipeTags,
+    recipeCategories,
+    recipeIngredients,
+    recipeUtensils,
+    recipeSteps,
+    ...rest
+  } = recipe;
   return {
     ...rest,
     tags: recipeTags.map((rt) => rt.tag),
@@ -421,5 +212,6 @@ export function flattenRecipe<
       quantity: ru.quantity,
       position: ru.position,
     })),
+    steps: recipeSteps.map((s) => s.content),
   };
 }

@@ -20,9 +20,9 @@ export default async function NewRecipePage() {
   ]);
 
   return (
-    <main className="mx-auto w-full max-w-[1180px] animate-fade-up px-[18px] pb-20 pt-7 sm:px-8">
+    <main className="mx-auto w-full max-w-content animate-fade-up px-[18px] pb-20 pt-7 sm:px-8">
       <Link
-        href="/recipes"
+        href="/recettes"
         className="inline-flex items-center gap-2 py-1.5 text-[15px] font-semibold text-ink-soft transition hover:text-accent"
       >
         <Icon name="back" size={18} /> Retour

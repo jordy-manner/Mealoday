@@ -33,10 +33,10 @@ export function Tag({
 }) {
   const veg = VEG_TAGS.has(children);
   const cls = veg
-    ? "bg-green-soft text-green-ink"
+    ? "bg-veg-soft text-veg"
     : accent
       ? "bg-accent-soft text-accent-ink"
-      : "bg-surface-2 text-ink-soft";
+      : "bg-surface-muted text-ink-soft";
   return (
     <span
       className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold ${cls}`}

@@ -6,6 +6,7 @@ import { Difficulty, FavoriteButton, RecipePhoto, Tag, formatTime } from "./reci
 
 export type RecipeCardData = {
   id: string;
+  slug: string;
   title: string;
   description: string | null;
   prepTime: number | null;
@@ -57,8 +58,8 @@ export function RecipeCard({
 
   return (
     <Link
-      href={`/recipes/${r.id}`}
-      className={`group relative flex overflow-hidden rounded-card border border-line-soft bg-surface shadow-soft transition duration-200 hover:-translate-y-1 hover:border-line hover:shadow-pop ${
+      href={`/recettes/${r.slug}`}
+      className={`group relative flex overflow-hidden rounded-card border border-line-soft bg-surface shadow-card transition duration-200 hover:-translate-y-1 hover:border-line hover:shadow-card-lg ${
         big ? "flex-col md:col-span-2 md:flex-row" : "flex-col"
       }`}
     >
@@ -72,9 +73,9 @@ export function RecipeCard({
             {category}
           </span>
         )}
-        <FavoriteButton className="absolute right-3.5 top-3.5 h-9 w-9 shadow-soft" />
+        <FavoriteButton className="absolute right-3.5 top-3.5 h-9 w-9 shadow-card" />
         {match && (
-          <span className="absolute bottom-3.5 left-3.5 rounded-full bg-green px-3 py-1 font-mono text-[11px] font-medium text-white">
+          <span className="absolute bottom-3.5 left-3.5 rounded-full bg-veg px-3 py-1 font-mono text-[11px] font-medium text-white">
             {match.count}/{match.total} ingrédients
           </span>
         )}

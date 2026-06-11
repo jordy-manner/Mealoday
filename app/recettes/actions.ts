@@ -9,12 +9,28 @@ import {
   recipeIngredientsCreate,
   recipeInputFromFormData,
   recipeScalars,
+  recipeStepsCreate,
   recipeTagsCreate,
   recipeUtensilsCreate,
+  slugify,
 } from "@/lib/recipes";
 
 // State returned to the form via useActionState (error display).
 export type FormState = { error: string | null };
+
+/** Returns a unique slug based on `base`, suffixing -2, -3… on collision. */
+async function uniqueSlug(base: string, excludeId?: string): Promise<string> {
+  let slug = base;
+  let n = 2;
+  while (true) {
+    const existing = await prisma.recipe.findUnique({
+      where: { slug },
+      select: { id: true },
+    });
+    if (!existing || existing.id === excludeId) return slug;
+    slug = `${base}-${n++}`;
+  }
+}
 
 type ImageFields = { imageUrl: string | null; imagePublicId: string | null };
 
@@ -66,19 +82,23 @@ export async function createRecipeAction(
     return { error: e instanceof Error ? e.message : "Échec de l'upload de la photo" };
   }
 
+  const slug = await uniqueSlug(slugify(result.data.title));
+
   const recipe = await prisma.recipe.create({
     data: {
+      slug,
       ...recipeScalars(result.data),
       ...image,
       recipeIngredients: { create: recipeIngredientsCreate(result.data) },
       recipeUtensils: { create: recipeUtensilsCreate(result.data) },
       recipeTags: { create: recipeTagsCreate(result.data) },
       recipeCategories: { create: recipeCategoriesCreate(result.data) },
+      recipeSteps: { create: recipeStepsCreate(result.data) },
     },
   });
 
-  revalidatePath("/recipes");
-  redirect(`/recipes/${recipe.id}`);
+  revalidatePath("/recettes");
+  redirect(`/recettes/${recipe.slug}`);
 }
 
 export async function updateRecipeAction(
@@ -93,7 +113,7 @@ export async function updateRecipeAction(
 
   const existing = await prisma.recipe.findUnique({
     where: { id },
-    select: { imageUrl: true, imagePublicId: true },
+    select: { imageUrl: true, imagePublicId: true, slug: true },
   });
   if (!existing) {
     return { error: "Recette introuvable" };
@@ -124,12 +144,13 @@ export async function updateRecipeAction(
         deleteMany: {},
         create: recipeCategoriesCreate(result.data),
       },
+      recipeSteps: { deleteMany: {}, create: recipeStepsCreate(result.data) },
     },
   });
 
-  revalidatePath("/recipes");
-  revalidatePath(`/recipes/${id}`);
-  redirect(`/recipes/${id}`);
+  revalidatePath("/recettes");
+  revalidatePath(`/recettes/${existing.slug}`);
+  redirect(`/recettes/${existing.slug}`);
 }
 
 export async function deleteRecipeAction(formData: FormData): Promise<void> {
@@ -143,6 +164,6 @@ export async function deleteRecipeAction(formData: FormData): Promise<void> {
     await getMediaStore().remove(existing.imagePublicId);
   }
 
-  revalidatePath("/recipes");
-  redirect("/recipes");
+  revalidatePath("/recettes");
+  redirect("/recettes");
 }

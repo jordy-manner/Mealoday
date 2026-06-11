@@ -19,6 +19,7 @@ const DIFF_LABELS: Record<number, string> = { 1: "Facile", 2: "Moyen", 3: "Diffi
 
 export type RecipeDetailData = {
   id: string;
+  slug: string;
   title: string;
   description: string | null;
   servings: number | null;
@@ -84,18 +85,18 @@ export function RecipeDetail({
     recipe.fat != null;
 
   return (
-    <main className="mx-auto w-full max-w-[1180px] animate-fade-up px-[18px] pt-7 sm:px-8">
+    <main className="mx-auto w-full max-w-content animate-fade-up px-[18px] pt-7 sm:px-8">
       {/* Top actions */}
       <div className="flex items-center justify-between gap-4">
         <Link
-          href="/recipes"
+          href="/recettes"
           className="inline-flex items-center gap-2 py-1.5 text-[15px] font-semibold text-ink-soft transition hover:text-accent"
         >
           <Icon name="back" size={18} /> Retour
         </Link>
         <div className="flex items-center gap-2">
           <Link
-            href={`/recipes/${recipe.id}/edit`}
+            href={`/recettes/${recipe.slug}/modifier`}
             className="rounded-full border border-line bg-surface px-4 py-2 text-[13.5px] font-semibold text-ink-soft transition hover:border-ink-faint hover:text-ink"
           >
             Modifier
@@ -168,21 +169,21 @@ export function RecipeDetail({
         </div>
 
         <div className="relative">
-          <div className="aspect-[4/5] overflow-hidden rounded-card shadow-pop">
+          <div className="aspect-[4/5] overflow-hidden rounded-card shadow-card-lg">
             <RecipePhoto
               imageUrl={recipe.imageUrl}
               title={recipe.title}
               label="photo du plat"
             />
           </div>
-          <FavoriteButton className="absolute bottom-4 left-1/2 -translate-x-1/2 gap-2 whitespace-nowrap px-5 py-2.5 text-[14px] font-bold shadow-pop [&>svg]:mr-1" />
+          <FavoriteButton className="absolute bottom-4 left-1/2 -translate-x-1/2 gap-2 whitespace-nowrap px-5 py-2.5 text-[14px] font-bold shadow-card-lg [&>svg]:mr-1" />
         </div>
       </div>
 
       {/* Body */}
       <div className="grid items-start gap-7 pb-16 md:grid-cols-[340px_1fr] md:gap-14">
         {/* Ingredients aside */}
-        <aside className="rounded-card border border-line-soft bg-surface p-6 shadow-soft md:sticky md:top-[92px]">
+        <aside className="rounded-card border border-line-soft bg-surface p-6 shadow-card md:sticky md:top-[92px]">
           <div className="mb-4 flex items-center justify-between gap-3">
             <h2 className="font-display text-[24px] font-medium">Ingrédients</h2>
             <div className="flex items-center overflow-hidden rounded-full border border-line">
@@ -190,7 +191,7 @@ export function RecipeDetail({
                 type="button"
                 onClick={() => setServes((s) => Math.max(1, s - 1))}
                 aria-label="Moins de portions"
-                className="grid h-8 w-8 place-items-center text-lg font-bold transition hover:bg-surface-2"
+                className="grid h-8 w-8 place-items-center text-lg font-bold transition hover:bg-surface-muted"
               >
                 <Icon name="minus" size={16} />
               </button>
@@ -201,7 +202,7 @@ export function RecipeDetail({
                 type="button"
                 onClick={() => setServes((s) => s + 1)}
                 aria-label="Plus de portions"
-                className="grid h-8 w-8 place-items-center text-lg font-bold transition hover:bg-surface-2"
+                className="grid h-8 w-8 place-items-center text-lg font-bold transition hover:bg-surface-muted"
               >
                 <Icon name="plus" size={16} />
               </button>
@@ -239,7 +240,7 @@ export function RecipeDetail({
                 {recipe.utensils.map((u, i) => (
                   <li
                     key={i}
-                    className="rounded-full bg-surface-2 px-3 py-1.5 text-[13px] text-ink-soft"
+                    className="rounded-full bg-surface-muted px-3 py-1.5 text-[13px] text-ink-soft"
                   >
                     {u.quantity != null && u.quantity > 1 && (
                       <span className="font-semibold text-ink">{u.quantity}× </span>
@@ -288,13 +289,13 @@ export function RecipeDetail({
                     onClick={() => setDone((d) => ({ ...d, [i]: !d[i] }))}
                     className={`flex cursor-pointer items-start gap-4 rounded-card border p-5 transition ${
                       isDone
-                        ? "border-line-soft bg-surface-2"
+                        ? "border-line-soft bg-surface-muted"
                         : "border-line-soft bg-surface hover:border-line"
                     }`}
                   >
                     <span
                       className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-[15px] font-bold transition ${
-                        isDone ? "bg-green text-white" : "bg-accent-soft text-accent-ink"
+                        isDone ? "bg-veg text-white" : "bg-accent-soft text-accent-ink"
                       }`}
                     >
                       {isDone ? <Icon name="check" size={16} /> : i + 1}
@@ -335,7 +336,7 @@ export function RecipeDetail({
 
 function NutriCell({ label, value }: { label: string; value: number | null }) {
   return (
-    <div className="rounded-field bg-surface-2 px-2.5 py-3 text-center">
+    <div className="rounded-input bg-surface-muted px-2.5 py-3 text-center">
       <span className="block text-[19px] font-semibold text-ink">
         {value != null ? value : "—"}
         {value != null && <small className="ml-0.5 text-[11px] text-ink-faint">g</small>}

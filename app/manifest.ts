@@ -8,7 +8,7 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: "Marmite.",
     description:
       "Cuisine maison pour tous : recherchez, consultez et créez vos recettes.",
-    start_url: "/recipes",
+    start_url: "/recettes",
     display: "standalone",
     background_color: "#fff3e9",
     theme_color: "#d8582e",

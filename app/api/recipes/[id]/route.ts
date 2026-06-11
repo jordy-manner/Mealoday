@@ -5,6 +5,7 @@ import {
   recipeCategoriesCreate,
   recipeIngredientsCreate,
   recipeScalars,
+  recipeStepsCreate,
   recipeTagsCreate,
   recipeUtensilsCreate,
   validateRecipeInput,
@@ -27,6 +28,7 @@ const withRelations = {
     include: { category: true },
     orderBy: { position: "asc" },
   },
+  recipeSteps: { orderBy: { order: "asc" } },
 } as const;
 
 // GET /api/recipes/[id]
@@ -85,6 +87,8 @@ export async function PUT(request: Request, { params }: Params) {
         deleteMany: {},
         create: recipeCategoriesCreate(result.data),
       },
+      // Replace the steps.
+      recipeSteps: { deleteMany: {}, create: recipeStepsCreate(result.data) },
     },
     include: withRelations,
   });

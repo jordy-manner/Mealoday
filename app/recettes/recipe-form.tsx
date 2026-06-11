@@ -78,7 +78,7 @@ const EMPTY: RecipeFormValues = {
 const DIFF_LABELS: Record<number, string> = { 1: "Facile", 2: "Moyen", 3: "Difficile" };
 
 const fieldBase =
-  "rounded-field border border-line bg-surface px-3.5 py-3 text-[15px] text-ink outline-none transition focus:border-accent focus:shadow-[0_0_0_3px_var(--color-accent-soft)] placeholder:text-ink-faint";
+  "rounded-input border border-line bg-surface px-3.5 py-3 text-[15px] text-ink outline-none transition focus:border-accent focus:shadow-[0_0_0_3px_var(--color-accent-soft)] placeholder:text-ink-faint";
 const fieldCls = `${fieldBase} w-full`;
 
 function Block({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
@@ -119,7 +119,7 @@ function SubmitButton({ label, disabled }: { label: string; disabled: boolean })
     <button
       type="submit"
       disabled={pending || disabled}
-      className="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-[15px] font-semibold text-white shadow-soft transition hover:bg-accent-deep active:translate-y-px disabled:cursor-not-allowed disabled:opacity-40"
+      className="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-[15px] font-semibold text-white shadow-card transition hover:bg-accent-deep active:translate-y-px disabled:cursor-not-allowed disabled:opacity-40"
     >
       <Icon name="check" size={18} />
       {pending ? "Enregistrement…" : label}
@@ -154,7 +154,7 @@ function SortableRow({
         {...attributes}
         {...listeners}
         aria-label="Glisser pour réordonner"
-        className={`grid shrink-0 cursor-grab touch-none place-items-center rounded-field text-ink-faint transition hover:bg-surface-2 hover:text-ink-soft active:cursor-grabbing ${handleClassName ?? "h-[38px] w-7"}`}
+        className={`grid shrink-0 cursor-grab touch-none place-items-center rounded-input text-ink-faint transition hover:bg-surface-muted hover:text-ink-soft active:cursor-grabbing ${handleClassName ?? "h-[38px] w-7"}`}
       >
         <Icon name="grip" size={16} />
       </button>
@@ -170,7 +170,7 @@ function RemoveButton({ onClick, label, disabled }: { onClick: () => void; label
       onClick={onClick}
       disabled={disabled}
       aria-label={label}
-      className="grid h-[38px] w-[38px] shrink-0 place-items-center rounded-field border border-line bg-surface text-ink-faint transition hover:border-accent hover:bg-accent-soft hover:text-accent disabled:cursor-not-allowed disabled:opacity-35"
+      className="grid h-[38px] w-[38px] shrink-0 place-items-center rounded-input border border-line bg-surface text-ink-faint transition hover:border-accent hover:bg-accent-soft hover:text-accent disabled:cursor-not-allowed disabled:opacity-35"
     >
       <Icon name="x" size={16} />
     </button>
@@ -182,7 +182,7 @@ function AddRowButton({ onClick, children }: { onClick: () => void; children: Re
     <button
       type="button"
       onClick={onClick}
-      className="mt-3 inline-flex items-center gap-2 whitespace-nowrap rounded-field border border-dashed border-line bg-surface px-[18px] py-2.5 text-[14px] font-semibold text-ink-soft transition hover:border-accent hover:bg-accent-soft hover:text-accent"
+      className="mt-3 inline-flex items-center gap-2 whitespace-nowrap rounded-input border border-dashed border-line bg-surface px-[18px] py-2.5 text-[14px] font-semibold text-ink-soft transition hover:border-accent hover:bg-accent-soft hover:text-accent"
     >
       <Icon name="plus" size={16} /> {children}
     </button>
@@ -337,7 +337,7 @@ export function RecipeForm({
     >
       <div className="min-w-0 max-w-[720px]">
         {state.error && (
-          <p className="mb-5 rounded-field bg-accent-soft px-4 py-3 text-sm font-medium text-accent-ink">
+          <p className="mb-5 rounded-input bg-accent-soft px-4 py-3 text-sm font-medium text-accent-ink">
             {state.error}
           </p>
         )}
@@ -360,14 +360,14 @@ export function RecipeForm({
                 <button
                   type="button"
                   onClick={() => fileRef.current?.click()}
-                  className="rounded-full bg-surface px-3.5 py-2 text-[13px] font-bold text-ink shadow-soft transition hover:text-accent"
+                  className="rounded-full bg-surface px-3.5 py-2 text-[13px] font-bold text-ink shadow-card transition hover:text-accent"
                 >
                   Changer la photo
                 </button>
                 <button
                   type="button"
                   onClick={clearPhoto}
-                  className="rounded-full bg-surface px-3.5 py-2 text-[13px] font-bold text-ink-faint shadow-soft transition hover:text-accent"
+                  className="rounded-full bg-surface px-3.5 py-2 text-[13px] font-bold text-ink-faint shadow-card transition hover:text-accent"
                 >
                   Retirer
                 </button>
@@ -379,7 +379,7 @@ export function RecipeForm({
               onClick={() => fileRef.current?.click()}
               className="flex w-full flex-col items-center justify-center gap-1.5 rounded-card border-2 border-dashed border-line px-6 py-10 text-center text-ink-faint transition hover:border-accent hover:bg-accent-soft"
             >
-              <span className="mb-1.5 grid h-14 w-14 place-items-center rounded-full bg-surface-2 text-accent">
+              <span className="mb-1.5 grid h-14 w-14 place-items-center rounded-full bg-surface-muted text-accent">
                 <Icon name="image" size={26} />
               </span>
               <b className="text-[15px] text-ink">Ajouter une photo</b>
@@ -441,7 +441,7 @@ export function RecipeForm({
           </Field>
 
           <Field label="Difficulté">
-            <div className="flex overflow-hidden rounded-field border border-line">
+            <div className="flex overflow-hidden rounded-input border border-line">
               {[1, 2, 3].map((d) => (
                 <button
                   key={d}
@@ -450,7 +450,7 @@ export function RecipeForm({
                   className={`flex-1 border-r border-line px-2 py-2.5 text-[13.5px] font-semibold transition last:border-r-0 ${
                     f.difficulty === d
                       ? "bg-accent text-white"
-                      : "bg-surface text-ink-soft hover:bg-surface-2"
+                      : "bg-surface text-ink-soft hover:bg-surface-muted"
                   }`}
                 >
                   {DIFF_LABELS[d]}
@@ -729,7 +729,7 @@ export function RecipeForm({
         {/* Actions */}
         <div className="mt-7 flex items-center justify-end gap-3 border-t border-line pt-6">
           <Link
-            href="/recipes"
+            href="/recettes"
             className="rounded-full px-4 py-2.5 text-[14px] font-semibold text-ink-soft transition hover:text-ink"
           >
             Annuler
@@ -741,7 +741,7 @@ export function RecipeForm({
       {/* Live preview */}
       <aside className="sticky top-[92px] hidden md:block">
         <span className="eyebrow">Aperçu</span>
-        <article className="mt-3 overflow-hidden rounded-card border border-line-soft bg-surface shadow-soft">
+        <article className="mt-3 overflow-hidden rounded-card border border-line-soft bg-surface shadow-card">
           <div className="relative aspect-[16/10]">
             <RecipePhoto
               imageUrl={preview}

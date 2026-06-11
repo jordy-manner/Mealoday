@@ -2,6 +2,16 @@
 
 All notable changes to the project, by release. Versions follow the `vMAJOR.MINOR.PATCH` format; each release maps to a git tag and a Vercel Preview/Production deployment.
 
+## [v0.2.1] — 2026-06-11
+
+- Steps moved to their own `Step` table (content + order); every recipe now has a unique `slug`.
+- Input validation rewritten with **Zod** (`lib/validation.ts`, single source of truth) across Server Actions and the REST API.
+- **Server-side search** (`lib/search.ts`): keyword search + by-ingredient scoring + category/time/difficulty filters in SQL, accent-insensitive via the Postgres `unaccent` extension. Search controls drive the URL; results render on the server.
+- French, slug-based routes: `/recettes`, `/recettes/[slug]`, `/recettes/[slug]/modifier`, `/recettes/nouvelle` (REST API stays `/api/recipes`).
+- Theme tokens aligned to the official handoff (`tailwind/theme.v4.css`): `surface-muted`, `veg`/`veg-soft`, `rounded-input`, `shadow-card`/`-lg`, `max-w-content`.
+- Seeded the 9 prototype recipes + the recovered "Pâte à Pizza".
+- Added `CONTEXT.md` (onboarding doc for humans/AI); `preview-release` now updates it before each commit.
+
 ## [v0.2.0] — 2026-06-11
 
 - Full visual redesign — frozen "Gourmand Arrondi · Terracotta · Magazine" design system: warm cream theme, terracotta accent, Newsreader/Hanken Grotesk/Spline Sans Mono fonts, sticky "Marmite." top bar and footer (Tailwind v4 tokens).
