@@ -18,7 +18,10 @@ export function Brand({ size = 21 }: { size?: number }) {
   );
 }
 
-const NAV = [{ label: "Accueil", href: "/recettes" }];
+const NAV = [
+  { label: "Accueil", href: "/" },
+  { label: "Recettes", href: "/recettes" },
+];
 
 export function TopBar() {
   const pathname = usePathname();
@@ -26,15 +29,15 @@ export function TopBar() {
   return (
     <header className="sticky top-0 z-40 border-b border-line-soft bg-bg/[0.88] backdrop-blur-[12px]">
       <div className="mx-auto flex h-[68px] w-full max-w-content items-center gap-7 px-[18px] sm:px-8">
-        <Link href="/recettes" className="shrink-0">
+        <Link href="/" className="shrink-0">
           <Brand />
         </Link>
 
         <nav className="hidden gap-1 sm:flex">
           {NAV.map((item) => {
             const active =
-              item.href === "/recettes"
-                ? pathname === "/recettes" || pathname === "/"
+              item.href === "/"
+                ? pathname === "/"
                 : pathname.startsWith(item.href);
             return (
               <Link

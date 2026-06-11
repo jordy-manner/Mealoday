@@ -42,12 +42,17 @@ plus **10 example recipes** (9 from the design prototype + the user’s “Pâte
 
 ## Routes (App Router, all under `app/`)
 User-facing routes are **in French**; the REST API stays `/api/recipes`.
-- `/` → redirects to `/recettes`.
-- `/recettes` — list + search/filter (Server Component).
+- `/` — **home**: hero + search + a single featured section ("Populaires cette
+  semaine", or the 4 latest as a fallback) with a "Tout voir →" link to `/recettes`.
+- `/recettes` — **catalogue**: compact header + the full recipe list, with
+  server-side search/filter when a query is active.
 - `/recettes/[slug]` — recipe detail (lookup by `slug`).
 - `/recettes/[slug]/modifier` — edit.
 - `/recettes/nouvelle` — create.
 - `GET/POST /api/recipes`, `GET/PUT/DELETE /api/recipes/[id]` — REST mirror.
+
+Shared list helpers (`cardInclude`, `toCard`, `MagazineGrid`, `SectionHead`,
+`EmptyState`, `CardRow`) live in `app/recettes/_shared.tsx`, used by both pages.
 
 ## Architecture
 - **Reads** = Server Components querying Prisma directly (`export const dynamic = "force-dynamic"`).

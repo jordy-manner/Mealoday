@@ -2,6 +2,13 @@
 
 All notable changes to the project, by release. Versions follow the `vMAJOR.MINOR.PATCH` format; each release maps to a git tag and a Vercel Preview/Production deployment.
 
+## [v0.2.3] — 2026-06-11
+
+- Split the lean home (`/`) from the catalogue (`/recettes`). The home is a landing page: hero + search + a single featured section ("Populaires cette semaine", or the 4 latest as a fallback) with a "Tout voir →" link to the catalogue. `/recettes` is now the full catalogue (compact header + complete list / server-side search).
+- Two-link navigation (Accueil → `/`, Recettes → `/recettes`); the logo links to the home.
+- Factored the shared list helpers (`cardInclude`, `toCard`, `MagazineGrid`, `SectionHead`, `EmptyState`, `CardRow`) into `app/recettes/_shared.tsx` — no duplication between the two pages.
+- Fix: missing space between "cuisine" and "aujourd'hui" in the hero title (JSX whitespace).
+
 ## [v0.2.2] — 2026-06-11
 
 - Ingredient unit is now an editable combobox (`UnitCombobox`): catalog dropdown + free value, replacing the datalist input.
