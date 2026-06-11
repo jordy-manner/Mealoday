@@ -27,8 +27,16 @@ import { StepEditor } from "./step-editor";
 import { UnitCombobox } from "./unit-combobox";
 import { Icon } from "../components/icons";
 import { RecipePhoto, Tag, formatTime } from "../components/recipe-ui";
+import { MONTHS } from "@/lib/seasons-data";
+import type { SeasonMode } from "@/lib/seasonality";
 
-type IngredientRow = { key: number; name: string; quantity: string; unit: string };
+type IngredientRow = {
+  key: number;
+  name: string;
+  quantity: string;
+  unit: string;
+  isPrimary: boolean;
+};
 type UtensilRow = { key: number; name: string; quantity: string };
 type StepRow = { key: number; value: string };
 
@@ -48,11 +56,13 @@ export type RecipeFormValues = {
   carbs: string;
   fat: string;
   imageUrl: string | null;
-  ingredients: { name: string; quantity: string; unit: string }[];
+  ingredients: { name: string; quantity: string; unit: string; isPrimary?: boolean }[];
   utensils: { name: string; quantity: string }[];
   steps: string[];
   tags: string[];
   categories: string[];
+  seasonMode: SeasonMode;
+  seasonMonths: number[];
 };
 
 const EMPTY: RecipeFormValues = {
@@ -76,9 +86,17 @@ const EMPTY: RecipeFormValues = {
   steps: [],
   tags: [],
   categories: [],
+  seasonMode: "AUTO",
+  seasonMonths: [],
 };
 
 const DIFF_LABELS: Record<number, string> = { 1: "Facile", 2: "Moyen", 3: "Difficile" };
+
+const SEASON_OPTIONS: { value: SeasonMode; label: string; hint: string }[] = [
+  { value: "AUTO", label: "Automatique", hint: "basé sur les ingrédients principaux" },
+  { value: "MANUAL", label: "Manuel", hint: "plage de mois" },
+  { value: "ALWAYS", label: "Toute l'année", hint: "disponible en continu" },
+];
 
 const fieldBase =
   "rounded-input border border-line bg-surface px-3.5 py-3 text-[15px] text-ink outline-none transition focus:border-accent focus:shadow-[0_0_0_3px_var(--color-accent-soft)] placeholder:text-ink-faint";
@@ -237,8 +255,16 @@ export function RecipeForm({
     carbs: defaultValues.carbs,
     fat: defaultValues.fat,
     categories: defaultValues.categories,
+    seasonMode: defaultValues.seasonMode,
+    seasonMonths: defaultValues.seasonMonths,
   });
   const set = (patch: Partial<typeof f>) => setF((prev) => ({ ...prev, ...patch }));
+  const toggleMonth = (m: number) =>
+    set({
+      seasonMonths: f.seasonMonths.includes(m)
+        ? f.seasonMonths.filter((x) => x !== m)
+        : [...f.seasonMonths, m].sort((a, b) => a - b),
+    });
   const [tags, setTags] = useState<string[]>(defaultValues.tags);
 
   // Photo: existing URL (edit) + a local preview when a new file is picked.
@@ -261,15 +287,18 @@ export function RecipeForm({
   // Ingredient rows (at least one visible).
   const initialRows = defaultValues.ingredients.length
     ? defaultValues.ingredients
-    : [{ name: "", quantity: "", unit: "" }];
+    : [{ name: "", quantity: "", unit: "", isPrimary: false }];
   const keyCounter = useRef(initialRows.length);
   const [rows, setRows] = useState<IngredientRow[]>(
-    initialRows.map((r, i) => ({ key: i, ...r })),
+    initialRows.map((r, i) => ({ key: i, isPrimary: false, ...r })),
   );
   const updateRow = (key: number, patch: Partial<IngredientRow>) =>
     setRows((rs) => rs.map((r) => (r.key === key ? { ...r, ...patch } : r)));
   const addRow = () =>
-    setRows((rs) => [...rs, { key: keyCounter.current++, name: "", quantity: "", unit: "" }]);
+    setRows((rs) => [
+      ...rs,
+      { key: keyCounter.current++, name: "", quantity: "", unit: "", isPrimary: false },
+    ]);
   const removeRow = (key: number) =>
     setRows((rs) => (rs.length > 1 ? rs.filter((r) => r.key !== key) : rs));
   const reorderRows = ({ active, over }: DragEndEvent) => {
@@ -577,6 +606,9 @@ export function RecipeForm({
             <span className="min-w-0 flex-1">Ingrédient</span>
             <span className="w-24">Quantité</span>
             <span className="w-32">Unité</span>
+            <span className="w-[38px] text-center" title="Ingrédient principal">
+              Princ.
+            </span>
             <span className="w-[38px]" />
           </div>
           <DndContext
@@ -619,8 +651,27 @@ export function RecipeForm({
                       options={unitOptions}
                       className="w-32"
                     />
-                    {/* Positional submission: one ingredientUnit value per row. */}
+                    {/* Positional submission: one value per row, per field. */}
                     <input type="hidden" name="ingredientUnit" value={row.unit} />
+                    <input
+                      type="hidden"
+                      name="ingredientIsPrimary"
+                      value={row.isPrimary ? "true" : "false"}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => updateRow(row.key, { isPrimary: !row.isPrimary })}
+                      aria-pressed={row.isPrimary}
+                      title="Marquer comme ingrédient principal"
+                      aria-label="Marquer comme ingrédient principal"
+                      className={`grid h-[38px] w-[38px] shrink-0 place-items-center rounded-input border transition ${
+                        row.isPrimary
+                          ? "border-transparent bg-accent-soft text-accent"
+                          : "border-line bg-surface text-ink-faint hover:border-ink-faint hover:text-ink-soft"
+                      }`}
+                    >
+                      <Icon name="star" size={16} fill={row.isPrimary ? "currentColor" : "none"} />
+                    </button>
                     <RemoveButton
                       onClick={() => removeRow(row.key)}
                       label="Supprimer cet ingrédient"
@@ -632,11 +683,84 @@ export function RecipeForm({
             </SortableContext>
           </DndContext>
           <AddRowButton onClick={addRow}>Ajouter un ingrédient</AddRowButton>
+          <p className="mt-3 flex items-start gap-1.5 text-[12.5px] leading-relaxed text-ink-faint">
+            <Icon name="star" size={14} className="mt-0.5 shrink-0 text-accent" fill="currentColor" />
+            Les ingrédients marqués comme principaux (★) sont utilisés pour la détection
+            automatique de la saison de la recette.
+          </p>
           <datalist id="ingredient-options">
             {ingredientOptions.map((o) => (
               <option key={o} value={o} />
             ))}
           </datalist>
+        </Block>
+
+        {/* 4b. Seasonality */}
+        <Block title="Saisonnalité">
+          <Field label="Disponibilité de la recette">
+            <div className="flex flex-col gap-2">
+              {SEASON_OPTIONS.map((opt) => {
+                const on = f.seasonMode === opt.value;
+                return (
+                  <label
+                    key={opt.value}
+                    className={`flex cursor-pointer items-center gap-3 rounded-input border px-3.5 py-3 transition ${
+                      on
+                        ? "border-accent bg-accent-soft"
+                        : "border-line bg-surface hover:border-ink-faint"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="seasonMode"
+                      value={opt.value}
+                      checked={on}
+                      onChange={() => set({ seasonMode: opt.value })}
+                      className="h-4 w-4 accent-[var(--color-accent)]"
+                    />
+                    <span className="text-[14.5px] font-semibold text-ink">
+                      {opt.label}
+                      <span className="ml-1.5 font-medium text-ink-faint">— {opt.hint}</span>
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+          </Field>
+
+          {f.seasonMode === "MANUAL" && (
+            <Field label="Mois de disponibilité" hint="cliquez pour (dé)sélectionner">
+              <div className="flex flex-wrap gap-2">
+                {MONTHS.map((label, i) => {
+                  const m = i + 1;
+                  const on = f.seasonMonths.includes(m);
+                  return (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => toggleMonth(m)}
+                      aria-pressed={on}
+                      className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-[13.5px] font-semibold transition ${
+                        on
+                          ? "border-transparent bg-accent-soft text-accent-ink"
+                          : "border-line text-ink-soft hover:border-ink-faint"
+                      }`}
+                    >
+                      {on && <Icon name="check" size={13} />}
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+              {/* Positional submission: one hidden input per selected month. */}
+              {f.seasonMonths.map((m) => (
+                <input key={m} type="hidden" name="seasonMonth" value={m} />
+              ))}
+              <p className="mt-2 text-[12.5px] leading-relaxed text-ink-faint">
+                Vous pouvez chevaucher l&apos;année (ex. novembre, décembre, janvier, février).
+              </p>
+            </Field>
+          )}
         </Block>
 
         {/* 5. Steps */}

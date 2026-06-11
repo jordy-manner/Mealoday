@@ -15,6 +15,7 @@ const CATEGORY_META: Record<
 > = {
   fruits: { icon: "cherry", label: "Fruit", color: "text-accent" },
   légumes: { icon: "carrot", label: "Légume", color: "text-veg" },
+  légumineuses: { icon: "leaf", label: "Légumineuse", color: "text-amber-ink" },
   herbes: { icon: "sprout", label: "Herbe", color: "text-veg" },
 };
 

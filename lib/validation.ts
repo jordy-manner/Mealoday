@@ -64,10 +64,29 @@ const steps = z.preprocess(
 const nameOf = (r: unknown) =>
   r && typeof r === "object" ? String((r as Record<string, unknown>).name ?? "").trim() : "";
 
+/** Truthy form value ("on"/"true"/true) → boolean. */
+const boolField = z.preprocess(
+  (v) => v === true || v === "true" || v === "on" || v === "1",
+  z.boolean(),
+);
+
+/** Months 1–12: accepts strings/numbers, drops out-of-range, dedupes, sorts. */
+const monthList = z.preprocess(
+  (v) => {
+    const arr = Array.isArray(v) ? v : v == null || v === "" ? [] : [v];
+    const months = arr
+      .map((n) => Number(String(n).trim()))
+      .filter((n) => Number.isInteger(n) && n >= 1 && n <= 12);
+    return [...new Set(months)].sort((a, b) => a - b);
+  },
+  z.array(z.number().int().min(1).max(12)),
+);
+
 const ingredientSchema = z.object({
   name: z.string().trim().min(1),
   quantity: floatField("La quantité", 1_000_000),
   unit: trimmedOrNull,
+  isPrimary: boolField,
 });
 
 const utensilSchema = z.object({
@@ -108,6 +127,11 @@ export const recipeInputSchema = z.object({
   steps,
   tags: stringList,
   categories: stringList,
+  seasonMode: z.preprocess(
+    (v) => (typeof v === "string" ? v.toUpperCase() : v),
+    z.enum(["AUTO", "MANUAL", "ALWAYS"]).default("AUTO"),
+  ),
+  seasonMonths: monthList,
 });
 
 export type RecipeInput = z.infer<typeof recipeInputSchema>;

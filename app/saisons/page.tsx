@@ -31,6 +31,7 @@ export default async function SaisonsPage({
     tout: produce.length,
     fruits: 0,
     légumes: 0,
+    légumineuses: 0,
     herbes: 0,
   };
   for (const p of produce) counts[p.category] += 1;
@@ -65,8 +66,8 @@ export default async function SaisonsPage({
           Que cuisiner en <em className="italic text-accent">{monthName.toLowerCase()}</em>&nbsp;?
         </h1>
         <p className="mb-7 max-w-[560px] text-[18px] leading-relaxed text-ink-soft">
-          Fruits, légumes et herbes de saison, leur empreinte carbone, et les recettes à
-          cuisiner maintenant.
+          Fruits, légumes, légumineuses et herbes de saison, et les recettes à cuisiner
+          maintenant.
         </p>
         <SeasonControls
           products={produce}

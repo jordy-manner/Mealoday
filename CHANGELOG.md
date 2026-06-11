@@ -2,6 +2,24 @@
 
 All notable changes to the project, by release. Versions follow the `vMAJOR.MINOR.PATCH` format; each release maps to a git tag and a Vercel Preview/Production deployment.
 
+## [v0.2.9] — 2026-06-11
+
+- **Recipe seasonality**: a recipe now declares how its in-season months are
+  resolved — `seasonMode` (`AUTO` / `MANUAL` / `ALWAYS`) + `seasonMonths` (`Int[]`),
+  and each `RecipeIngredient` can be flagged `isPrimary`. New `lib/seasonality.ts`
+  `getRecipeActiveMonths`: `ALWAYS` → all year; `MANUAL` → its months (year-wrap
+  supported, e.g. Nov→Feb); `AUTO` → the union of the in-season months of the
+  recipe's **primary** ingredients. The form gains a ★ toggle per ingredient and a
+  "Saisonnalité" section; `/saisons` now matches recipes via `getRecipeActiveMonths`.
+  Prisma migration `season_fields` + Zod/Server-Action wiring.
+- **Single seasonal dataset**: produce now comes from a committed, Zod-validated
+  `lib/data/seasonality.json` (`lib/produce.ts`, 108 items, sources: Greenpeace /
+  Interfel / chambres d'agriculture) — **no external runtime API**. Dropped the
+  ADEME Impact CO2 fetch + snapshot, the redundant `herbs-seasonality.json` /
+  `lib/herbs.ts`, and `IMPACTCO2_API_KEY`. Added a **Légumineuses** category. The
+  dataset has no carbon footprint, so the carbon UI degrades (badges hidden,
+  "non disponible" on the detail page).
+
 ## [v0.2.8] — 2026-06-11
 
 - **Mobile navigation overhaul**: replaced the burger + right drawer with a fixed bottom **tab bar** (Accueil · Recettes · **Créer** raised center · Saisons · **Plus**) and a **bottom sheet** behind "Plus" (Organiser: Menu de la semaine / Liste de courses — Mon espace: Favoris / Paramètres). The mobile top bar collapses to logo + a search icon; the nav and "Créer"/"Rechercher" pills are now desktop-only. Active tab via `usePathname` (e.g. `/recettes/nouvelle` maps to Créer, not Recettes), `aria-current` on the active tab, `role="dialog"` sheet with Escape + body scroll-lock, safe-area padding, and a `sheet-up` animation.

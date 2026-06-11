@@ -107,17 +107,12 @@ export function ProductDetail({
                 </span>
               </div>
               <p className="text-[12.5px] leading-relaxed text-ink-faint">
-                Source ADEME · Impact CO₂. Privilégier les produits locaux et de pleine saison
-                réduit l&apos;empreinte.
+                Privilégier les produits locaux et de pleine saison réduit l&apos;empreinte.
               </p>
             </>
           ) : (
             <p className="text-[13px] text-ink-faint">
-              Donnée d&apos;empreinte non disponible
-              {product.category === "herbes"
-                ? " — les herbes aromatiques ne figurent pas dans la source ADEME"
-                : ""}
-              .
+              Donnée d&apos;empreinte carbone non disponible pour ce produit.
             </p>
           )}
         </div>

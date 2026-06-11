@@ -1,0 +1,1339 @@
+{
+  "_meta": {
+    "sources": [
+      "Greenpeace France — https://www.greenpeace.fr/guetteur/calendrier/",
+      "Interfel — https://www.lesfruitsetlegumesfrais.com/calendrier-fruits-legumes/",
+      "Chambres d'agriculture France (herbes aromatiques)"
+    ],
+    "scope": "France métropolitaine",
+    "updated": "2025-06",
+    "note": "months: 1 = janvier, 12 = décembre"
+  },
+  "items": [
+    {
+      "slug": "ail",
+      "label": "Ail",
+      "category": "legumes",
+      "months": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "artichaut",
+      "label": "Artichaut",
+      "category": "legumes",
+      "months": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "slug": "asperge",
+      "label": "Asperge",
+      "category": "legumes",
+      "months": [
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "slug": "aubergine",
+      "label": "Aubergine",
+      "category": "legumes",
+      "months": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "slug": "betterave",
+      "label": "Betterave",
+      "category": "legumes",
+      "months": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "blette",
+      "label": "Blette",
+      "category": "legumes",
+      "months": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "slug": "brocoli",
+      "label": "Brocoli",
+      "category": "legumes",
+      "months": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "slug": "cardon",
+      "label": "Cardon",
+      "category": "legumes",
+      "months": [
+        11
+      ]
+    },
+    {
+      "slug": "carotte",
+      "label": "Carotte",
+      "category": "legumes",
+      "months": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "celeri-branche",
+      "label": "Céleri-branche",
+      "category": "legumes",
+      "months": [
+        1,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "celeri-rave",
+      "label": "Céleri-rave",
+      "category": "legumes",
+      "months": [
+        1,
+        2,
+        3,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "chou",
+      "label": "Chou",
+      "category": "legumes",
+      "months": [
+        1,
+        3,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "chou-blanc",
+      "label": "Chou blanc",
+      "category": "legumes",
+      "months": [
+        1,
+        2,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "chou-de-bruxelles",
+      "label": "Chou de Bruxelles",
+      "category": "legumes",
+      "months": [
+        1,
+        2,
+        3,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "chou-fleur",
+      "label": "Chou-fleur",
+      "category": "legumes",
+      "months": [
+        3,
+        4,
+        5,
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "slug": "chou-frise",
+      "label": "Chou frisé",
+      "category": "legumes",
+      "months": [
+        1,
+        2,
+        3,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "chou-romanesco",
+      "label": "Chou romanesco",
+      "category": "legumes",
+      "months": [
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "slug": "chou-rouge",
+      "label": "Chou rouge",
+      "category": "legumes",
+      "months": [
+        1,
+        2,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "citrouille",
+      "label": "Citrouille",
+      "category": "legumes",
+      "months": [
+        11
+      ]
+    },
+    {
+      "slug": "concombre",
+      "label": "Concombre",
+      "category": "legumes",
+      "months": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "slug": "courge",
+      "label": "Courge",
+      "category": "legumes",
+      "months": [
+        1,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "courgette",
+      "label": "Courgette",
+      "category": "legumes",
+      "months": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "slug": "crosne",
+      "label": "Crosne",
+      "category": "legumes",
+      "months": [
+        1,
+        2,
+        3,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "echalote",
+      "label": "Échalote",
+      "category": "legumes",
+      "months": [
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "endive",
+      "label": "Endive",
+      "category": "legumes",
+      "months": [
+        1,
+        2,
+        3,
+        4,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "epinard",
+      "label": "Épinard",
+      "category": "legumes",
+      "months": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "slug": "fenouil",
+      "label": "Fenouil",
+      "category": "legumes",
+      "months": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "slug": "frisee",
+      "label": "Frisée",
+      "category": "legumes",
+      "months": [
+        1,
+        2,
+        3,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "haricot-vert",
+      "label": "Haricot vert",
+      "category": "legumes",
+      "months": [
+        6,
+        7,
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "slug": "laitue",
+      "label": "Laitue",
+      "category": "legumes",
+      "months": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "slug": "mache",
+      "label": "Mâche",
+      "category": "legumes",
+      "months": [
+        1,
+        2,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "navet",
+      "label": "Navet",
+      "category": "legumes",
+      "months": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "oignon",
+      "label": "Oignon",
+      "category": "legumes",
+      "months": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "panais",
+      "label": "Panais",
+      "category": "legumes",
+      "months": [
+        1,
+        2,
+        3,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "patate-douce",
+      "label": "Patate douce",
+      "category": "legumes",
+      "months": [
+        9,
+        10
+      ]
+    },
+    {
+      "slug": "petit-pois",
+      "label": "Petit pois",
+      "category": "legumes",
+      "months": [
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "slug": "poireau",
+      "label": "Poireau",
+      "category": "legumes",
+      "months": [
+        1,
+        2,
+        3,
+        4,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "poivron",
+      "label": "Poivron",
+      "category": "legumes",
+      "months": [
+        6,
+        7,
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "slug": "pomme-de-terre-primeur",
+      "label": "Pomme de terre primeur",
+      "category": "legumes",
+      "months": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    {
+      "slug": "pomme-de-terre",
+      "label": "Pomme de terre",
+      "category": "legumes",
+      "months": [
+        1,
+        2,
+        3,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "potiron",
+      "label": "Potiron",
+      "category": "legumes",
+      "months": [
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "radis",
+      "label": "Radis",
+      "category": "legumes",
+      "months": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "rutabaga",
+      "label": "Rutabaga",
+      "category": "legumes",
+      "months": [
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "salsifi",
+      "label": "Salsifi",
+      "category": "legumes",
+      "months": [
+        1,
+        2,
+        3,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "topinambour",
+      "label": "Topinambour",
+      "category": "legumes",
+      "months": [
+        1,
+        2,
+        3,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "abricot",
+      "label": "Abricot",
+      "category": "fruits",
+      "months": [
+        6,
+        7,
+        8
+      ]
+    },
+    {
+      "slug": "amande-fraiche",
+      "label": "Amande fraîche",
+      "category": "fruits",
+      "months": [
+        7,
+        8
+      ]
+    },
+    {
+      "slug": "amande-seche",
+      "label": "Amande sèche",
+      "category": "fruits",
+      "months": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "baie-de-goji",
+      "label": "Baie de goji",
+      "category": "fruits",
+      "months": [
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "slug": "brugnon",
+      "label": "Brugnon",
+      "category": "fruits",
+      "months": [
+        6,
+        7,
+        8
+      ]
+    },
+    {
+      "slug": "cassis",
+      "label": "Cassis",
+      "category": "fruits",
+      "months": [
+        6,
+        7,
+        8
+      ]
+    },
+    {
+      "slug": "cerise",
+      "label": "Cerise",
+      "category": "fruits",
+      "months": [
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "slug": "chataigne",
+      "label": "Châtaigne",
+      "category": "fruits",
+      "months": [
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "citron",
+      "label": "Citron",
+      "category": "fruits",
+      "months": [
+        1,
+        2,
+        3,
+        6,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "clementine",
+      "label": "Clémentine",
+      "category": "fruits",
+      "months": [
+        1,
+        2,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "coing",
+      "label": "Coing",
+      "category": "fruits",
+      "months": [
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "slug": "figue",
+      "label": "Figue",
+      "category": "fruits",
+      "months": [
+        7,
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "slug": "fraise",
+      "label": "Fraise",
+      "category": "fruits",
+      "months": [
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    {
+      "slug": "framboise",
+      "label": "Framboise",
+      "category": "fruits",
+      "months": [
+        6,
+        7,
+        8,
+        10
+      ]
+    },
+    {
+      "slug": "groseille",
+      "label": "Groseille",
+      "category": "fruits",
+      "months": [
+        6,
+        7,
+        8
+      ]
+    },
+    {
+      "slug": "kaki",
+      "label": "Kaki",
+      "category": "fruits",
+      "months": [
+        1,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "kiwi",
+      "label": "Kiwi",
+      "category": "fruits",
+      "months": [
+        1,
+        2,
+        3,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "mandarine",
+      "label": "Mandarine",
+      "category": "fruits",
+      "months": [
+        1,
+        2,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "melon",
+      "label": "Melon",
+      "category": "fruits",
+      "months": [
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "slug": "mirabelle",
+      "label": "Mirabelle",
+      "category": "fruits",
+      "months": [
+        8,
+        9
+      ]
+    },
+    {
+      "slug": "mure",
+      "label": "Mûre",
+      "category": "fruits",
+      "months": [
+        8,
+        9
+      ]
+    },
+    {
+      "slug": "myrtille",
+      "label": "Myrtille",
+      "category": "fruits",
+      "months": [
+        7,
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "slug": "nectarine",
+      "label": "Nectarine",
+      "category": "fruits",
+      "months": [
+        7,
+        8
+      ]
+    },
+    {
+      "slug": "noisette",
+      "label": "Noisette",
+      "category": "fruits",
+      "months": [
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "slug": "noix",
+      "label": "Noix",
+      "category": "fruits",
+      "months": [
+        9,
+        10
+      ]
+    },
+    {
+      "slug": "orange",
+      "label": "Orange",
+      "category": "fruits",
+      "months": [
+        1,
+        2,
+        3,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "pamplemousse",
+      "label": "Pamplemousse",
+      "category": "fruits",
+      "months": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "pasteque",
+      "label": "Pastèque",
+      "category": "fruits",
+      "months": [
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "slug": "peche",
+      "label": "Pêche",
+      "category": "fruits",
+      "months": [
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "slug": "physalis",
+      "label": "Physalis",
+      "category": "fruits",
+      "months": [
+        1,
+        2,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "poire",
+      "label": "Poire",
+      "category": "fruits",
+      "months": [
+        1,
+        2,
+        3,
+        4,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "pomme",
+      "label": "Pomme",
+      "category": "fruits",
+      "months": [
+        1,
+        2,
+        3,
+        6,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "prune",
+      "label": "Prune",
+      "category": "fruits",
+      "months": [
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "slug": "pruneau",
+      "label": "Pruneau",
+      "category": "fruits",
+      "months": [
+        8,
+        9
+      ]
+    },
+    {
+      "slug": "raisin",
+      "label": "Raisin",
+      "category": "fruits",
+      "months": [
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "slug": "rhubarbe",
+      "label": "Rhubarbe",
+      "category": "fruits",
+      "months": [
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    {
+      "slug": "tomate",
+      "label": "Tomate",
+      "category": "fruits",
+      "months": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "slug": "basilic",
+      "label": "Basilic",
+      "category": "herbes",
+      "months": [
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "slug": "ciboulette",
+      "label": "Ciboulette",
+      "category": "herbes",
+      "months": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "slug": "coriandre",
+      "label": "Coriandre",
+      "category": "herbes",
+      "months": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "slug": "estragon",
+      "label": "Estragon",
+      "category": "herbes",
+      "months": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "slug": "laurier",
+      "label": "Laurier",
+      "category": "herbes",
+      "months": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "menthe",
+      "label": "Menthe",
+      "category": "herbes",
+      "months": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "slug": "oseille",
+      "label": "Oseille",
+      "category": "herbes",
+      "months": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "slug": "persil",
+      "label": "Persil",
+      "category": "herbes",
+      "months": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "slug": "romarin",
+      "label": "Romarin",
+      "category": "herbes",
+      "months": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "sarriette",
+      "label": "Sarriette",
+      "category": "herbes",
+      "months": [
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "slug": "sauge",
+      "label": "Sauge",
+      "category": "herbes",
+      "months": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "slug": "thym",
+      "label": "Thym",
+      "category": "herbes",
+      "months": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "avoine",
+      "label": "Avoine",
+      "category": "legumineuses",
+      "months": [
+        6,
+        7,
+        12
+      ]
+    },
+    {
+      "slug": "ble",
+      "label": "Blé",
+      "category": "legumineuses",
+      "months": [
+        7,
+        12
+      ]
+    },
+    {
+      "slug": "feverole",
+      "label": "Féverole",
+      "category": "legumineuses",
+      "months": [
+        7
+      ]
+    },
+    {
+      "slug": "haricot-blanc",
+      "label": "Haricot blanc",
+      "category": "legumineuses",
+      "months": [
+        7,
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "slug": "lentille",
+      "label": "Lentille",
+      "category": "legumineuses",
+      "months": [
+        1,
+        2,
+        3,
+        11,
+        12
+      ]
+    },
+    {
+      "slug": "mais",
+      "label": "Maïs",
+      "category": "legumineuses",
+      "months": [
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "slug": "orge",
+      "label": "Orge",
+      "category": "legumineuses",
+      "months": [
+        6,
+        7,
+        12
+      ]
+    },
+    {
+      "slug": "pois",
+      "label": "Pois",
+      "category": "legumineuses",
+      "months": [
+        6,
+        7
+      ]
+    },
+    {
+      "slug": "quinoa",
+      "label": "Quinoa",
+      "category": "legumineuses",
+      "months": [
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "slug": "riz",
+      "label": "Riz",
+      "category": "legumineuses",
+      "months": [
+        9
+      ]
+    },
+    {
+      "slug": "sarrasin",
+      "label": "Sarrasin",
+      "category": "legumineuses",
+      "months": [
+        9
+      ]
+    },
+    {
+      "slug": "seigle",
+      "label": "Seigle",
+      "category": "legumineuses",
+      "months": [
+        6,
+        7,
+        12
+      ]
+    },
+    {
+      "slug": "soja",
+      "label": "Soja",
+      "category": "legumineuses",
+      "months": [
+        10
+      ]
+    },
+    {
+      "slug": "tournesol",
+      "label": "Tournesol",
+      "category": "legumineuses",
+      "months": [
+        9
+      ]
+    }
+  ]
+}

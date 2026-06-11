@@ -29,10 +29,13 @@ All many-to-many relations use **explicit join tables** (project convention).
   `prepTime?`, `cookTime?`, `restTime?` (minutes; total time = prep + cook + rest),
   `difficulty?` (1–3), `rating?` (0–5), `author?`,
   `popular` (bool), nutrition `kcal?/protein?/carbs?/fat?` (per serving),
-  `imageUrl?` + `imagePublicId?` (Cloudinary), `createdAt`, `updatedAt`.
+  `imageUrl?` + `imagePublicId?` (Cloudinary), `createdAt`, `updatedAt`,
+  `seasonMode` (enum **SeasonMode** `AUTO | MANUAL | ALWAYS`, default `AUTO`) +
+  `seasonMonths` (`Int[]`, the active months 1–12, used only in MANUAL mode).
 - **Step** — ordered prep steps: `content` (Markdown) + `order`, FK to Recipe.
 - **Ingredient** / **Unit** — reusable catalogs (`name` unique).
-- **RecipeIngredient** — join carrying `quantity?` (Float), `unitId?`, `position`.
+- **RecipeIngredient** — join carrying `quantity?` (Float), `unitId?`, `position`,
+  `isPrimary` (bool, default false): "main" ingredients drive AUTO seasonality.
 - **Utensil** + **RecipeUtensil** — join carrying `quantity?` (Int), `position`.
 - **Tag** + **RecipeTag** — shared tags.
 - **Category** + **RecipeCategory** — a recipe may have several categories (`position`).
@@ -51,7 +54,11 @@ User-facing routes are **in French**; the REST API stays `/api/recipes`.
 - `/recettes/[slug]/modifier` — edit.
 - `/recettes/nouvelle` — create.
 - `/saisons` — **seasonal calendar**: produce in season by month (band + `?m=`),
-  category/sort filters, seasonality search, and matched seasonal recipes.
+  category/sort filters, seasonality search, and matched seasonal recipes. A recipe
+  matches month *m* when `getRecipeActiveMonths` (`lib/seasonality.ts`) includes it:
+  `ALWAYS` → all year; `MANUAL` → its `seasonMonths`; `AUTO` → the union of the
+  in-season months of its **primary** ingredients (matched against the produce
+  dataset, no external runtime API).
 - `/saisons/[slug]` — product detail: a full page that, when opened from `/saisons`,
   is shown as a **drawer** via parallel + intercepting routes (`@modal` slot +
   `@modal/(.)[slug]`). Direct visit / refresh / share renders the full page.
@@ -97,6 +104,13 @@ fixed bar never hides the footer/content.
 - `lib/recipes.ts` — shared types, `slugify`, Prisma-write helpers (`recipe*Create`),
   `flattenRecipe` (relations → ergonomic shapes).
 - `lib/validation.ts` — Zod schema; `RecipeInput` is `z.infer` (single source of truth).
+- `lib/seasonality.ts` — `getRecipeActiveMonths(recipe, produce)`: pure resolution of
+  a recipe's in-season months (AUTO/MANUAL/ALWAYS). Ingredient↔produce name matching
+  (`ingredientMatches`) lives in `lib/seasons-data.ts` (pure, client-safe).
+- `lib/produce.ts` — loads `lib/data/seasonality.json` (Zod-validated) into the
+  `Produce[]` used by `/saisons`. Categories: fruits, légumes, légumineuses, herbes.
+- `lib/seasons.ts` — `getProduce()` (returns the committed dataset) + recipe↔produce
+  matching for `/saisons`.
 - `lib/media.ts` — media abstraction.
 - `app/recettes/` — `page.tsx` (list/search), `home-screen` (search UI), `recipe-detail`,
   `recipe-form` (+ `step-editor`, `tags-combobox`), `actions.ts`, `[slug]/`, `nouvelle/`.
@@ -141,8 +155,7 @@ Rule: **use theme tokens only**, no hardcoded values. Home recipe layout = **Mag
 - `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` (+ optional
   `CLOUDINARY_FOLDER`) — photo uploads. Unset → gradient placeholders, upload disabled.
 - `PEXELS_API_KEY` — seasonal calendar produce images (`lib/pexels.ts`, server-only,
-  cached). Unset → gradient placeholders. `IMPACTCO2_API_KEY` — optional ADEME key
-  (`lib/seasons.ts`); the fruits & vegetables dataset falls back to the committed
-  snapshot in `lib/seasons-data.ts` when the live API is unavailable. Herbs are not
-  in ADEME — they come from a committed, Zod-validated dataset
-  (`lib/data/herbs-seasonality.json` via `lib/herbs.ts`), merged in at runtime.
+  cached). Unset → gradient placeholders. The seasonal produce itself (fruits,
+  vegetables, pulses, herbs) is a committed, Zod-validated dataset
+  (`lib/data/seasonality.json` via `lib/produce.ts`) — no external runtime API. It
+  carries no carbon footprint, so `ecv` is null and the carbon UI degrades.

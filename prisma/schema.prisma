@@ -12,6 +12,13 @@ datasource db {
   provider = "postgresql"
 }
 
+// How a recipe's "in season" months are determined.
+enum SeasonMode {
+  AUTO // derived from the primary ingredients' seasons
+  MANUAL // explicit month list (seasonMonths)
+  ALWAYS // available all year round
+}
+
 model Recipe {
   id          String   @id @default(cuid())
   slug        String   @unique // URL-friendly identifier derived from the title
@@ -27,6 +34,11 @@ model Recipe {
   popular     Boolean  @default(false) // featured in the "popular" section
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  // Seasonality: how the recipe's active months are computed. In MANUAL mode,
+  // seasonMonths holds the active months (1–12); ignored for AUTO/ALWAYS.
+  seasonMode   SeasonMode @default(AUTO)
+  seasonMonths Int[]      @default([])
 
   // Nutrition facts, per serving (all optional).
   kcal    Int?
@@ -91,6 +103,8 @@ model RecipeIngredient {
   unit         Unit?      @relation(fields: [unitId], references: [id], onDelete: SetNull)
   unitId       String?
   position     Int        @default(0) // display order within the recipe
+  // Marks a "main" ingredient, used for AUTO seasonality detection.
+  isPrimary    Boolean    @default(false)
 
   @@id([recipeId, ingredientId])
   @@index([ingredientId])

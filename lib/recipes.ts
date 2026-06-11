@@ -39,10 +39,12 @@ export function recipeInputFromFormData(formData: FormData): ValidationResult {
   const ingredientNames = formData.getAll("ingredientName");
   const ingredientQuantities = formData.getAll("ingredientQuantity");
   const ingredientUnits = formData.getAll("ingredientUnit");
+  const ingredientPrimary = formData.getAll("ingredientIsPrimary");
   const ingredients = ingredientNames.map((name, i) => ({
     name,
     quantity: ingredientQuantities[i] ?? "",
     unit: ingredientUnits[i] ?? "",
+    isPrimary: ingredientPrimary[i] ?? "false",
   }));
 
   const utensilNames = formData.getAll("utensilName");
@@ -72,6 +74,8 @@ export function recipeInputFromFormData(formData: FormData): ValidationResult {
     steps: formData.getAll("step"), // one textarea per step (StepEditor)
     tags: formData.getAll("tag"), // one hidden input per tag (TagsCombobox)
     categories: formData.getAll("category"), // one hidden input per category
+    seasonMode: formData.get("seasonMode"),
+    seasonMonths: formData.getAll("seasonMonth"), // one hidden input per month
   });
 }
 
@@ -94,6 +98,8 @@ export function recipeScalars(input: RecipeInput) {
     protein: input.protein,
     carbs: input.carbs,
     fat: input.fat,
+    seasonMode: input.seasonMode,
+    seasonMonths: input.seasonMonths,
   };
 }
 
@@ -111,6 +117,7 @@ export function recipeIngredientsCreate(input: RecipeInput) {
   return input.ingredients.map((ing, position) => ({
     position,
     quantity: ing.quantity,
+    isPrimary: ing.isPrimary,
     ingredient: {
       connectOrCreate: { where: { name: ing.name }, create: { name: ing.name } },
     },
@@ -167,6 +174,7 @@ type RawRecipeIngredient = {
   quantity: number | null;
   unit: { name: string } | null;
   position: number;
+  isPrimary: boolean;
 };
 type RawRecipeUtensil = {
   utensilId: string;
@@ -207,6 +215,7 @@ export function flattenRecipe<
       quantity: ri.quantity,
       unit: ri.unit?.name ?? null,
       position: ri.position,
+      isPrimary: ri.isPrimary,
     })),
     utensils: recipeUtensils.map((ru) => ({
       id: ru.utensilId,

@@ -91,6 +91,7 @@ export default async function EditRecipePage({ params }: Props) {
             name: i.name,
             quantity: i.quantity?.toString() ?? "",
             unit: i.unit ?? "",
+            isPrimary: i.isPrimary,
           })),
           utensils: recipe.utensils.map((u) => ({
             name: u.name,
@@ -99,6 +100,8 @@ export default async function EditRecipePage({ params }: Props) {
           steps: recipe.steps,
           tags: recipe.tags.map((t) => t.name),
           categories: recipe.categories.map((c) => c.name),
+          seasonMode: recipe.seasonMode,
+          seasonMonths: recipe.seasonMonths,
         }}
       />
     </main>

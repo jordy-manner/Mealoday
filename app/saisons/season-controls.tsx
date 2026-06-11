@@ -11,6 +11,7 @@ const CATS: { key: "tout" | ProduceCategory; label: string }[] = [
   { key: "tout", label: "Tout" },
   { key: "fruits", label: "Fruits" },
   { key: "légumes", label: "Légumes" },
+  { key: "légumineuses", label: "Légumineuses" },
   { key: "herbes", label: "Herbes" },
 ];
 
