@@ -97,8 +97,13 @@ User-facing routes are **in French**; the REST API stays `/api/recipes`.
     relations in a transaction). Ingredients/utensils carry a custom `image`
     (priority over the auto Pexels thumbnail via `GET /api/pexels`).
   - `/parametres/saisons` — seasonal-data status card (stats + last-check date +
-    "Vérifier les sources" job), sources list, auto-check frequency.
+    **"Mettre à jour"** button → `runSeasonUpdate`), sources list, auto-check
+    frequency (Manuelle / Hebdomadaire / Mensuelle).
 - `GET /api/pexels?q=` — server-side Pexels thumbnail lookup for catalog images.
+- `GET /api/cron/season-update` — scheduled seasonal-data update. A single daily
+  **Vercel Cron** (`vercel.json`) hits it; the route gates on the chosen frequency +
+  last-check date (Manuelle → never, Hebdo → ≥ 7 d, Mensuelle → ≥ 28 d). Protected by
+  `CRON_SECRET` (`Authorization: Bearer …`); a no-op 401 until that env var is set.
 - `GET/POST /api/recipes`, `GET/PUT/DELETE /api/recipes/[id]` — REST mirror.
 
 Shared list helpers (`cardInclude`, `toCard`, `MagazineGrid`, `SectionHead`,
@@ -199,6 +204,9 @@ rendering, which these pages already are).
 - `lib/settings.ts` — server-side `Setting` read/write; `getPexelsKey` (DB then
   env), `pexelsConfigured`, season frequency.
 - `lib/season-sources.ts` — referenced seasonal sources + `getSeasonStats` (DB).
+- `lib/season-update.ts` — `runSeasonUpdate()`: the operational seasonal update
+  (re-apply dataset → derive aisles from category → refresh ADEME carbon → stamp date),
+  shared by the manual button (`updateSeasonData`) and the cron route.
 - `app/parametres/` — `layout.tsx` + `_rail.tsx`/`_nav.ts` (rail), per-section
   pages, `_catalog-table.tsx` (reusable editor), `actions.ts` (catalog CRUD +
   merge + image), `settings-actions.ts` (Pexels key, season job),
@@ -266,6 +274,9 @@ token swap adds `.no-transition` on `<html>` for one frame (`app/globals.css`).
   back to `DATABASE_URL` if unset. Add it to `.env.local` (dev branch) and Vercel
   (prod branch). If it points to a different branch, migrations land on the wrong DB.
 - `APP_RELEASE` — current git tag, shown in the footer (committed in `.env`).
+- `CRON_SECRET` — secret for the seasonal-update cron (`/api/cron/season-update`). Vercel
+  Cron sends it as `Authorization: Bearer …`; set it in Vercel (Production). Unset → the
+  cron route returns 401 (safe no-op), the manual button still works.
 - `APP_MAINTENANCE` / `APP_MAINTENANCE_BYPASS` — maintenance mode (`proxy.ts`).
 - `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` (+ optional
   `CLOUDINARY_FOLDER`) — photo uploads. Unset → gradient placeholders, upload disabled.

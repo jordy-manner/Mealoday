@@ -1,8 +1,9 @@
 // Seasonal-data sources + stats for the /parametres "Données de saison" view.
 // The produce dataset is versioned in lib/data/seasonality.json and seeded into
 // the DB (Ingredient season fields). The referenced public sources are listed
-// here; "checking" compares the committed dataset and stamps the last-check
-// date (lib/settings) — it does not scrape live yet.
+// here. The actual "Mettre à jour" job lives in lib/season-update.ts
+// (re-applies the dataset, derives aisles, refreshes ADEME carbon, stamps the
+// date) — run manually from /parametres/saisons or on schedule by the cron.
 //
 // Server module (getSeasonStats imports prisma). SEASON_SOURCES is plain data.
 

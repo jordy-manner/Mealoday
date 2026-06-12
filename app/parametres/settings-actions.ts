@@ -2,7 +2,7 @@
 
 // Server Actions for the preference sections of /parametres: the Pexels API key
 // (a server secret — never returned to the client), the seasonal-data check
-// frequency, and the "Vérifier les sources" job. Theme/accent are not here:
+// frequency, and the manual "Mettre à jour" job. Theme/accent are not here:
 // they are a client preference (localStorage).
 
 import { revalidatePath } from "next/cache";
@@ -13,6 +13,7 @@ import {
   setSetting,
 } from "@/lib/settings";
 import { getSeasonStats, type SeasonStats } from "@/lib/season-sources";
+import { runSeasonUpdate, type SeasonUpdateResult } from "@/lib/season-update";
 
 export type ActionResult<T = unknown> =
   | ({ ok: true } & T)
@@ -40,16 +41,18 @@ export async function setSeasonFrequency(value: string): Promise<ActionResult> {
 }
 
 /**
- * "Vérifier les sources": recomputes the dataset stats from the DB and stamps
- * the last-check date. (No live scraping yet — this confirms the committed
- * dataset and records that a check ran; a real source diff will come later.)
+ * Manual one-off "Mettre à jour": runs the operational seasonal-data update
+ * (re-apply the dataset, derive aisles, refresh ADEME carbon, stamp the date),
+ * then returns the refreshed stats + a summary of what changed.
  */
-export async function checkSeasonSources(): Promise<
-  ActionResult<{ lastChecked: string; stats: SeasonStats }>
+export async function updateSeasonData(): Promise<
+  ActionResult<{ lastChecked: string; stats: SeasonStats; result: SeasonUpdateResult }>
 > {
-  const stats = await getSeasonStats();
-  const now = new Date().toISOString();
-  await setSetting(SETTING_KEYS.seasonLastChecked, now);
-  revalidatePath("/parametres/saisons");
-  return { ok: true, lastChecked: now, stats };
+  try {
+    const result = await runSeasonUpdate({ refreshCarbon: true });
+    const stats = await getSeasonStats();
+    return { ok: true, lastChecked: result.lastChecked, stats, result };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "Échec de la mise à jour" };
+  }
 }

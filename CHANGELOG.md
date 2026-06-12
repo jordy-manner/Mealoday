@@ -2,6 +2,25 @@
 
 All notable changes to the project, by release. Versions follow the `vMAJOR.MINOR.PATCH` format; each release maps to a git tag and a Vercel Preview/Production deployment.
 
+## [v0.2.21] — 2026-06-12
+
+- **Operational seasonal-data update** (`lib/season-update.ts` `runSeasonUpdate`):
+  re-applies the committed dataset to the DB (months/category), **derives each
+  produce's grocery aisle ("rayon") from its category** (fruits→Fruit, legumes→
+  Légume, herbes→Herbe, legumineuses→Épicerie) — only where the aisle is still
+  null, so manual edits aren't clobbered — **refreshes the carbon footprint from
+  the live ADEME Agribalyse API** (best-effort), then stamps the date. Filling
+  the aisles clears those entries from the "À compléter" / notification counts.
+- **Manual button**: `/parametres/saisons` now has a working **"Mettre à jour"**
+  button (`updateSeasonData` server action) that runs the update and reports what
+  changed (produits · rayons renseignés · carbone rafraîchi). Replaces the former
+  re-timestamp-only stub.
+- **Scheduled task**: a daily **Vercel Cron** (`vercel.json`) hits
+  `GET /api/cron/season-update`; the route gates on the chosen frequency
+  (Manuelle / Hebdomadaire / Mensuelle) + the last-check date, so the monthly (or
+  weekly) cadence is configurable at runtime. Protected by `CRON_SECRET`
+  (`Authorization: Bearer …`) — a safe 401 no-op until that env var is set.
+
 ## [v0.2.20] — 2026-06-12
 
 - **Notification center ("À traiter")**: a **bell** in the chrome — far right of the

@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { Icon } from "../components/icons";
 import type { SeasonSource, SeasonStats } from "@/lib/season-sources";
-import { checkSeasonSources, setSeasonFrequency } from "./settings-actions";
+import { updateSeasonData, setSeasonFrequency } from "./settings-actions";
 
 // Kept in sync with SEASON_FREQUENCIES in lib/settings (server validation). Not
 // imported from there to keep Prisma out of the client bundle.
@@ -31,17 +31,29 @@ export function SeasonData({
   const [frequency, setFrequency] = useState(initialFrequency);
   const [lastChecked, setLastChecked] = useState(initialLastChecked);
   const [justChecked, setJustChecked] = useState(false);
+  const [summary, setSummary] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
-  const check = () =>
+  const update = () =>
     startTransition(async () => {
-      const res = await checkSeasonSources();
-      if (res.ok) {
-        setStats(res.stats);
-        setLastChecked(res.lastChecked);
-        setJustChecked(true);
-        setTimeout(() => setJustChecked(false), 2600);
+      const res = await updateSeasonData();
+      if (!res.ok) {
+        setSummary(res.error);
+        return;
       }
+      setStats(res.stats);
+      setLastChecked(res.lastChecked);
+      setJustChecked(true);
+      const { result } = res;
+      const parts = [
+        `${result.imported} produits`,
+        result.aisleFilled > 0 ? `${result.aisleFilled} rayon${result.aisleFilled > 1 ? "s" : ""} renseigné${result.aisleFilled > 1 ? "s" : ""}` : null,
+        result.carbonAvailable
+          ? `carbone rafraîchi${result.carbonUpdated > 0 ? ` (${result.carbonUpdated})` : ""}`
+          : "carbone non disponible",
+      ].filter(Boolean);
+      setSummary(parts.join(" · "));
+      setTimeout(() => setJustChecked(false), 2600);
     });
 
   const onFrequency = (value: string) => {
@@ -78,23 +90,30 @@ export function SeasonData({
             )}
             <button
               type="button"
-              onClick={check}
+              onClick={update}
               disabled={pending}
               className="inline-flex items-center gap-1.5 rounded-input bg-accent px-3.5 py-2 text-sm font-semibold text-surface transition hover:bg-accent-deep disabled:opacity-60"
             >
               {pending ? (
                 <>
                   <span className="h-4 w-4 animate-spin rounded-full border-2 border-surface/40 border-t-surface" />
-                  Vérification…
+                  Mise à jour…
                 </>
               ) : (
                 <>
-                  <Icon name="refresh" size={16} /> Vérifier les sources
+                  <Icon name="refresh" size={16} /> Mettre à jour
                 </>
               )}
             </button>
           </div>
         </div>
+
+        {summary && (
+          <p className="mt-3 flex items-center gap-1.5 text-[13px] text-ink-soft" aria-live="polite">
+            <Icon name="check" size={14} className="shrink-0 text-veg" strokeWidth={2.4} />
+            {summary}
+          </p>
+        )}
 
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <Stat value={String(stats.produces)} label="produits" />
