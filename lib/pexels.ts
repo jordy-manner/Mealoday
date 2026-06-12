@@ -5,6 +5,7 @@
 // gradient placeholder (RecipePhoto).
 
 import { PEXELS_EN } from "@/lib/seasons-data";
+import { getPexelsKey } from "@/lib/settings";
 
 /** Builds the (English) Pexels query for a produce item. */
 export function produceQuery(slug: string, name: string): string {
@@ -13,7 +14,8 @@ export function produceQuery(slug: string, name: string): string {
 
 /** Returns a photo URL for the query, or null. */
 export async function pexelsImage(query: string): Promise<string | null> {
-  const key = process.env.PEXELS_API_KEY;
+  // Key from the DB setting first, then the PEXELS_API_KEY env fallback.
+  const key = await getPexelsKey();
   if (!key) return null;
   try {
     const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(

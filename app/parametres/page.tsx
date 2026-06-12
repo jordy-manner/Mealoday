@@ -1,13 +1,6 @@
-import type { Metadata } from "next";
-import { ComingSoon } from "../components/coming-soon";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Paramètres" };
-
-export default function Page() {
-  return (
-    <ComingSoon
-      title="Paramètres"
-      description="Gérez vos catalogues (ingrédients, ustensiles, unités, catégories, tags). Bientôt disponible."
-    />
-  );
+// /parametres has no content of its own — it opens on the Ingrédients catalog.
+export default function SettingsIndexPage() {
+  redirect("/parametres/ingredients");
 }

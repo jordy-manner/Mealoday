@@ -138,6 +138,73 @@ const paths: Record<string, ReactNode> = {
       <path d="M3 9h18M8 2.5v4M16 2.5v4" />
     </>
   ),
+  palette: (
+    <>
+      <path d="M12 2a10 10 0 1 0 0 20c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.2 0-1 .8-1.8 1.8-1.8H16a6 6 0 0 0 6-6c0-5-4.5-7.7-10-7.7Z" />
+      <circle cx="9.5" cy="7.5" r="1.1" fill="currentColor" stroke="none" />
+      <circle cx="13.5" cy="6.5" r="1.1" fill="currentColor" stroke="none" />
+      <circle cx="17" cy="10" r="1.1" fill="currentColor" stroke="none" />
+      <circle cx="6.5" cy="12" r="1.1" fill="currentColor" stroke="none" />
+    </>
+  ),
+  ruler: (
+    <>
+      <path d="M3 8.5 8.5 3 21 15.5 15.5 21Z" />
+      <path d="M7 7l2 2M10.5 10.5l2 2M14 14l2 2" />
+    </>
+  ),
+  key: (
+    <>
+      <circle cx="8" cy="15" r="4" />
+      <path d="M10.8 12.2 21 2M17 6l2 2M14 9l2 2" />
+    </>
+  ),
+  sparkle: <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z" />,
+  camera: (
+    <>
+      <path d="M3 8a2 2 0 0 1 2-2h2l1.5-2h7L19 6h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" />
+      <circle cx="12" cy="12.5" r="3.2" />
+    </>
+  ),
+  refresh: (
+    <>
+      <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
+      <path d="M21 3v5h-5" />
+      <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+      <path d="M3 21v-5h5" />
+    </>
+  ),
+  merge: (
+    <>
+      <path d="M7 21V9M7 9 3.5 12.5M7 9l3.5 3.5" />
+      <path d="M7 9c0-3 2-4 5-4h8.5M17 1.5 21 5l-4 3.5" />
+    </>
+  ),
+  alert: (
+    <>
+      <path d="M12 9v4M12 17h.01" />
+      <path d="M10.3 3.8 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0Z" />
+    </>
+  ),
+  globe: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18M12 3c2.6 2.7 2.6 15.3 0 18M12 3c-2.6 2.7-2.6 15.3 0 18" />
+    </>
+  ),
+  download: (
+    <>
+      <path d="M12 3v12M7 11l5 5 5-5" />
+      <path d="M4 20h16" />
+    </>
+  ),
+  lock: (
+    <>
+      <rect x="5" y="11" width="14" height="9" rx="2" />
+      <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+    </>
+  ),
+  trash: <path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14" />,
 };
 
 export type IconName = keyof typeof paths;

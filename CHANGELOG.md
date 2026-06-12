@@ -2,6 +2,43 @@
 
 All notable changes to the project, by release. Versions follow the `vMAJOR.MINOR.PATCH` format; each release maps to a git tag and a Vercel Preview/Production deployment.
 
+## [v0.2.18] — 2026-06-12
+
+- **Settings page (`/parametres`)**: a side-rail shell (grouped Préférences /
+  Catalogues / Données, sticky, active item `bg-accent-soft text-accent-ink`)
+  with sub-routes under a common layout; `/parametres` redirects to
+  `/parametres/ingredients`. The global breadcrumb now resolves FR labels +
+  icons for each sub-section.
+- **Editable catalogs** (`/parametres/{ingredients,ustensiles,unites}`): a
+  reusable `CatalogTable` client component — accent-insensitive search,
+  "Toutes (N)" / "À compléter (M)" chips, add-on-the-fly (draft row, focus
+  name), inline edit (text + selects), usage counter ("N rec." = recipe
+  relations), delete (trash when unused, **locked** + toast when used), and
+  **merge duplicates** (centered modal → Server Action that reassigns the
+  `RecipeIngredient`/`RecipeUtensil`/`unitId` relations in a transaction, then
+  deletes the source). "À compléter" is **derived** (required field null:
+  ingredient without aisle/default unit; unit without abbreviation/kind) →
+  pill + highlighted fields + filter. Ingredients/utensils carry a custom
+  `image` (priority over the auto **Pexels** thumbnail, lazy-loaded via the new
+  `GET /api/pexels`); custom imports upload through `lib/media` (Cloudinary).
+- **Général**: the Pexels API key is saved as a **server secret** (`Setting`
+  table, never returned to the client; `getPexelsKey` prefers it over the env
+  var); masked field + "Connectée" badge. AI key is a disabled "À venir"
+  placeholder.
+- **Apparence**: light/dark theme + accent (Terracotta/Paprika/Ambre/Olive),
+  a client preference (localStorage) applied app-wide by overriding the
+  `--color-*` tokens on `<html>`, with a before-paint bootstrap (no FOUC). The
+  token swap suppresses transitions for one frame (`.no-transition`) to avoid
+  the dark-mode custom-property freeze.
+- **Données de saison**: status card (pulsed voyant + last-check date +
+  "Vérifier les sources" job that recomputes the DB stats and stamps the date),
+  sources list with "Opérationnelle" voyants, and an auto-check frequency
+  (Manuelle / Hebdomadaire / Mensuelle). Frequency + last-check persisted in
+  `Setting`.
+- **Schema** (migration `settings_and_catalog_fields`): `Setting(key/value)`;
+  `Ingredient.aisle/defaultUnitId/image/imagePublicId`;
+  `Unit.abbreviation/kind`; `Utensil.image/imagePublicId`.
+
 ## [v0.2.17] — 2026-06-12
 
 - **Unified global chrome**: a **breadcrumb** (`Breadcrumb`, server, ≥ sm) is pinned

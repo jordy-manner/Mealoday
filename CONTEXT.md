@@ -33,15 +33,26 @@ All many-to-many relations use **explicit join tables** (project convention).
   `seasonMode` (enum **SeasonMode** `AUTO | MANUAL | ALWAYS`, default `AUTO`) +
   `seasonMonths` (`Int[]`, the active months 1–12, used only in MANUAL mode).
 - **Step** — ordered prep steps: `content` (Markdown) + `order`, FK to Recipe.
-- **Ingredient** / **Unit** — reusable catalogs (`name` unique). An ingredient is
-  also a **seasonal produce** when it carries season fields: `slug?` (unique, URL key
-  for `/saisons`), `category?` (enum `ProduceCategory` = fruits/legumes/herbes/
-  legumineuses; `null` = ordinary ingredient like salt/flour), `months Int[]`,
-  `ecv?` + `ecvSource?` (ADEME Agribalyse carbon), `seasonUpdatedAt?`. Editable from
-  the app (Server Actions) and a CLI — this is the source of truth for `/saisons`.
+- **Ingredient** / **Unit** — reusable catalogs (`name` unique). Catalog fields
+  edited from `/parametres`: Ingredient `aisle?` (grocery "rayon", free string
+  validated against `AISLES` in `lib/catalog`), `defaultUnit?` (FK to Unit, the
+  pre-filled unit), `image?` + `imagePublicId?` (custom photo, priority over the
+  auto Pexels thumbnail). Unit `abbreviation?` + `kind?` (family, `UNIT_KINDS`).
+  An entry is "À compléter" (derived, not stored) when a required field is null
+  (ingredient: aisle/defaultUnit; unit: abbreviation/kind). An ingredient is
+  also a **seasonal produce** when it carries season fields: `slug?` (unique, URL
+  key for `/saisons`), `category?` (enum `ProduceCategory` = fruits/legumes/
+  herbes/legumineuses; `null` = ordinary ingredient like salt/flour),
+  `months Int[]`, `ecv?` + `ecvSource?` (ADEME Agribalyse carbon),
+  `seasonUpdatedAt?`. Editable from the app (Server Actions) and a CLI — this is
+  the source of truth for `/saisons`.
 - **RecipeIngredient** — join carrying `quantity?` (Float), `unitId?`, `position`,
   `isPrimary` (bool, default false): "main" ingredients drive AUTO seasonality.
 - **Utensil** + **RecipeUtensil** — join carrying `quantity?` (Int), `position`.
+  Utensil also has a catalog `image?` + `imagePublicId?` (edited from `/parametres`).
+- **Setting** — server-side key/value store (`key` PK, `value`, `updatedAt`).
+  Holds the Pexels API key + seasonal-check frequency/last-check date. Secrets
+  read server-side only, never sent to the client (`lib/settings.ts`).
 - **Tag** + **RecipeTag** — shared tags.
 - **Category** + **RecipeCategory** — a recipe may have several categories (`position`).
 
@@ -67,10 +78,27 @@ User-facing routes are **in French**; the REST API stays `/api/recipes`.
 - `/saisons/[slug]` — product detail: a full page that, when opened from `/saisons`,
   is shown as a **drawer** via parallel + intercepting routes (`@modal` slot +
   `@modal/(.)[slug]`). Direct visit / refresh / share renders the full page.
-- `/menu-semaine`, `/liste-courses`, `/favoris`, `/parametres` — secondary
-  destinations, currently **stub pages** ("Bientôt disponible", `ComingSoon`
-  component). Reached from the mobile "Plus" sheet. `/parametres` will host the
-  catalog editors (ingredients, utensils, units, categories, tags).
+- `/menu-semaine`, `/liste-courses`, `/favoris` — secondary destinations,
+  currently **stub pages** ("Bientôt disponible", `ComingSoon` component).
+  Reached from the mobile "Plus" sheet / desktop "Plus" dropdown.
+- `/parametres` — **settings**, a side-rail shell (`app/parametres/layout.tsx` +
+  `_rail.tsx`, grouped Préférences / Catalogues / Données, sticky, active item
+  `bg-accent-soft text-accent-ink`). `/parametres` redirects to
+  `/parametres/ingredients`. Sub-routes:
+  - `/parametres/general` — Pexels API key (server secret, `lib/settings`),
+    AI-key placeholder ("À venir").
+  - `/parametres/apparence` — theme (clair/sombre) + accent (Terracotta/Paprika/
+    Ambre/Olive), a **client preference** (localStorage), applied app-wide by
+    overriding `--color-*` on `<html>` (see Design system / dark mode).
+  - `/parametres/{ingredients,ustensiles,unites}` — editable **catalog tables**
+    (`_catalog-table.tsx`, client): accent-insensitive search, "Toutes/À
+    compléter" chips, add-on-the-fly, inline edit, usage counter ("N rec."),
+    delete (blocked when used) + **merge duplicates** (reassigns the recipe
+    relations in a transaction). Ingredients/utensils carry a custom `image`
+    (priority over the auto Pexels thumbnail via `GET /api/pexels`).
+  - `/parametres/saisons` — seasonal-data status card (stats + last-check date +
+    "Vérifier les sources" job), sources list, auto-check frequency.
+- `GET /api/pexels?q=` — server-side Pexels thumbnail lookup for catalog images.
 - `GET/POST /api/recipes`, `GET/PUT/DELETE /api/recipes/[id]` — REST mirror.
 
 Shared list helpers (`cardInclude`, `toCard`, `MagazineGrid`, `SectionHead`,
@@ -143,6 +171,17 @@ rendering, which these pages already are).
 - `scripts/seasonality.ts` — CLI (`npm run seasonality -- <cmd>`): `import` (seed from
   the JSON), `refresh-carbon` (Agribalyse), `set <slug>` (edit one), `export` (backup).
 - `lib/media.ts` — media abstraction.
+- `lib/catalog.ts` — **client-safe** catalog constants/helpers (`AISLES`,
+  `UNIT_KINDS`, `norm` accent-insensitive, row types, incomplete derivations).
+- `lib/settings.ts` — server-side `Setting` read/write; `getPexelsKey` (DB then
+  env), `pexelsConfigured`, season frequency.
+- `lib/season-sources.ts` — referenced seasonal sources + `getSeasonStats` (DB).
+- `app/parametres/` — `layout.tsx` + `_rail.tsx`/`_nav.ts` (rail), per-section
+  pages, `_catalog-table.tsx` (reusable editor), `actions.ts` (catalog CRUD +
+  merge + image), `settings-actions.ts` (Pexels key, season job),
+  `_general-form.tsx`, `_apparence-controls.tsx`, `_season-data.tsx`.
+- `app/components/theme.ts` + `theme-script.tsx` — theme/accent tokens + the
+  before-paint bootstrap (applies the saved preference, no FOUC).
 - `app/recettes/` — `page.tsx` (list/search), `home-screen` (search UI), `recipe-detail`,
   `recipe-form` (+ `step-editor`, `tags-combobox`), `actions.ts`, `[slug]/`, `nouvelle/`.
 - `app/components/` — `icons`, `recipe-ui` (Photo/Tag/Difficulty/helpers), `recipe-card`
@@ -163,6 +202,13 @@ unversioned). Tokens in `app/globals.css` mirror `tailwind/theme.v4.css`:
 `rounded-card` (22px), `shadow-card`/`-lg`, `max-w-content` (1180px), `font-display`/`-sans`/`-mono`.
 Rule: **use theme tokens only**, no hardcoded values. Home recipe layout = **Magazine**
 (1 full-width feature card + a 2-column grid).
+**Theme/accent (Apparence):** light/dark + 4 accents are a client preference
+(`localStorage`), applied by overriding the `--color-*` custom properties on
+`<html>` at runtime (Tailwind v4 utilities read those vars, so the whole app
+re-cascades). A before-paint script (`theme-script.tsx` in the root layout)
+applies it with no FOUC. **Dark-mode pitfall:** never transition `background`/
+`color` tied to a custom property (the transition freezes the old value); the
+token swap adds `.no-transition` on `<html>` for one frame (`app/globals.css`).
 
 ## Conventions
 - **Language**: code comments, `CHANGELOG.md`, commit messages, `CONTEXT.md` and `.env`
@@ -196,8 +242,10 @@ Rule: **use theme tokens only**, no hardcoded values. Home recipe layout = **Mag
 - `APP_MAINTENANCE` / `APP_MAINTENANCE_BYPASS` — maintenance mode (`proxy.ts`).
 - `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` (+ optional
   `CLOUDINARY_FOLDER`) — photo uploads. Unset → gradient placeholders, upload disabled.
-- `PEXELS_API_KEY` — seasonal calendar produce images (`lib/pexels.ts`, server-only,
-  cached). Unset → gradient placeholders. The seasonal produce itself (fruits,
+- `PEXELS_API_KEY` — seasonal calendar produce images + catalog thumbnails
+  (`lib/pexels.ts`, server-only, cached). Unset → gradient placeholders. Can be
+  **overridden at runtime** by the Pexels key saved from `/parametres/general`
+  (stored in the `Setting` table; `getPexelsKey` prefers the DB value). The seasonal produce itself (fruits,
   vegetables, pulses, herbs) is stored in the **DB** (Ingredient season fields, editable
   from the app/CLI); `lib/data/seasonality.json` + `carbon-ademe.json` are the committed
   **seed source + fallback** (no external runtime API on reads). Carbon (`ecv`) comes

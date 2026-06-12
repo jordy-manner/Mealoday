@@ -96,6 +96,19 @@ model Ingredient {
   name              String             @unique
   recipeIngredients RecipeIngredient[]
 
+  // Catalog metadata (edited from /parametres). `aisle` is the grocery aisle
+  // ("rayon", e.g. "Légume", "Épicerie"; free string validated against AISLES
+  // in lib/catalog). `defaultUnit` pre-fills the unit when the ingredient is
+  // added to a recipe. Both null => the entry shows as "À compléter".
+  aisle         String?
+  defaultUnitId String?
+  defaultUnit   Unit?   @relation("IngredientDefaultUnit", fields: [defaultUnitId], references: [id], onDelete: SetNull)
+
+  // Optional custom image (priority over the auto Pexels thumbnail). The bytes
+  // live with the media provider; we only store the URL + the id to delete it.
+  image         String?
+  imagePublicId String?
+
   // Seasonality (null/empty for non-produce ingredients like salt, flour).
   slug            String?          @unique
   category        ProduceCategory?
@@ -105,6 +118,7 @@ model Ingredient {
   seasonUpdatedAt DateTime?
 
   @@index([category])
+  @@index([defaultUnitId])
 }
 
 // Catalog of reusable units of measure (e.g. "g", "kg", "ml", "pincée", "unité").
@@ -112,6 +126,17 @@ model Unit {
   id                String             @id @default(cuid())
   name              String             @unique
   recipeIngredients RecipeIngredient[]
+
+  // Catalog metadata (edited from /parametres). `abbreviation` is the short
+  // form shown in recipes ("g", "c. à s."); `kind` is the unit family (free
+  // string validated against UNIT_KINDS in lib/catalog). Either null => the
+  // entry shows as "À compléter".
+  abbreviation String?
+  kind         String?
+
+  // Ingredients that use this unit as their default (inverse of
+  // Ingredient.defaultUnit).
+  defaultForIngredients Ingredient[] @relation("IngredientDefaultUnit")
 }
 
 // Explicit Recipe <-> Ingredient join, carrying the quantity and the unit.
@@ -140,6 +165,11 @@ model Utensil {
   id             String          @id @default(cuid())
   name           String          @unique
   recipeUtensils RecipeUtensil[]
+
+  // Optional custom image (priority over the auto Pexels thumbnail). The bytes
+  // live with the media provider; we only store the URL + the id to delete it.
+  image         String?
+  imagePublicId String?
 }
 
 // Explicit Recipe <-> Utensil join, carrying the quantity (number of utensils).
@@ -194,4 +224,14 @@ model RecipeTag {
 
   @@id([recipeId, tagId])
   @@index([tagId])
+}
+
+// Server-side key/value settings edited from /parametres (e.g. the Pexels API
+// key, the seasonal-data check frequency + last-check date). Secrets live here,
+// read server-side only and never sent to the client. Theme/accent are NOT
+// stored here — they are a client preference (localStorage).
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
 }

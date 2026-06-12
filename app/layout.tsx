@@ -6,6 +6,7 @@ import { TopBar } from "./components/top-bar";
 import { Breadcrumb } from "./components/breadcrumb";
 import { MobileTabBar } from "./components/mobile-tab-bar";
 import { SiteFooter } from "./components/site-footer";
+import { ThemeScript } from "./components/theme-script";
 
 // Display serif (titles/hero), with italic for accents like the hero word.
 const newsreader = Newsreader({
@@ -61,6 +62,8 @@ export default function RootLayout({
         className="flex min-h-full flex-col pt-[68px] pb-[76px] sm:pb-0 sm:pt-[108px]"
         suppressHydrationWarning
       >
+        {/* Applies the saved theme/accent before paint (no light-theme flash). */}
+        <ThemeScript />
         <TopBar />
         {/* Suspense so the breadcrumb's headers()/DB lookup never blocks the page
             stream; its fixed-height slot is already reserved by the body padding. */}

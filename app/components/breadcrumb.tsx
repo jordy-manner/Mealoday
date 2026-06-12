@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Icon, type IconName } from "./icons";
+import { SETTINGS_ITEMS } from "../parametres/_nav";
 
 // Global breadcrumb, pinned under the TopBar on ≥ sm (hidden on mobile, where the
 // bottom tab bar is the nav). Server Component: reads the current path from the
@@ -52,7 +53,14 @@ async function buildCrumbs(path: string): Promise<Crumb[]> {
 
   if (root === "parametres") {
     crumbs.push(SECTION.parametres);
-    if (a) crumbs.push({ label: humanize(a), href: `/parametres/${a}` });
+    if (a) {
+      const item = SETTINGS_ITEMS[a];
+      crumbs.push({
+        label: item?.label ?? humanize(a),
+        icon: item?.icon,
+        href: `/parametres/${a}`,
+      });
+    }
     return crumbs;
   }
 

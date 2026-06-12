@@ -154,6 +154,21 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/*
+ * Theme switch (Apparence): the new theme/accent are applied by overriding the
+ * --color-* custom properties on <html> at runtime. To avoid the documented
+ * dark-mode pitfall — a `transition` freezing a value that comes from a custom
+ * property — we add `.no-transition` on <html> for one frame while swapping the
+ * tokens, so nothing animates the var() change. The body itself never
+ * transitions its background/color.
+ */
+.no-transition,
+.no-transition *,
+.no-transition *::before,
+.no-transition *::after {
+  transition: none !important;
+}
+
 /* Eyebrow: mono uppercase label used above section/hero titles. */
 .eyebrow {
   font-family: var(--font-mono);
