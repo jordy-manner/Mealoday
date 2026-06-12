@@ -2,6 +2,15 @@
 
 All notable changes to the project, by release. Versions follow the `vMAJOR.MINOR.PATCH` format; each release maps to a git tag and a Vercel Preview/Production deployment.
 
+## [v0.2.12] — 2026-06-12
+
+- New **page-transition loader**: a root `app/loading.tsx` (Suspense fallback)
+  renders a `Loader` (`app/components/loader.tsx`) in the content area during route
+  transitions that actually suspend — a large logo bubble with a pulsing halo, the
+  "Marmite." wordmark and a "ça mijote…" caption (bouncing dots). The fixed nav
+  chrome stays put; fast (prefetched) navigations remain instant. New `breathe` /
+  `halo` / `dot` keyframes.
+
 ## [v0.2.11] — 2026-06-12
 
 - The header (`TopBar`) is now **`fixed`** (was `sticky`) like the mobile bottom

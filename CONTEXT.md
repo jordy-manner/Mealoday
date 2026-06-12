@@ -125,7 +125,9 @@ behaviour stays uniform; because both are `fixed`, the `<body>` reserves space w
   `recipe-form` (+ `step-editor`, `tags-combobox`), `actions.ts`, `[slug]/`, `nouvelle/`.
 - `app/components/` — `icons`, `recipe-ui` (Photo/Tag/Difficulty/helpers), `recipe-card`
   (Magazine card), `top-bar`, `mobile-tab-bar` (bottom nav + "Plus" sheet),
-  `coming-soon` (stub page), `site-footer`.
+  `coming-soon` (stub page), `loader` (page-transition logo loader), `site-footer`.
+- `app/loading.tsx` — root navigation fallback (Suspense): renders `<Loader>` in the
+  content area during route transitions that actually suspend (the nav chrome stays).
 - `app/layout.tsx` — fonts + TopBar + Footer. `app/globals.css` — design tokens.
 - `app/manifest.ts`, `app/icon.svg`, `app/apple-icon.png` — favicon / PWA icons.
 
