@@ -1,7 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useRef, useState, type ReactNode } from "react";
+import {
+  useActionState,
+  useRef,
+  useState,
+  useTransition,
+  type ReactNode,
+} from "react";
 import { useFormStatus } from "react-dom";
 import {
   DndContext,
@@ -24,7 +30,12 @@ import { CSS } from "@dnd-kit/utilities";
 import type { FormState } from "./actions";
 import { TagsCombobox } from "./tags-combobox";
 import { StepEditor } from "./step-editor";
-import { UnitCombobox } from "./unit-combobox";
+import { FormCombobox, UnitCreateModal, type ComboOption } from "./form-combobox";
+import {
+  createIngredientEntry,
+  createUnitEntry,
+  createUtensilEntry,
+} from "./catalog-actions";
 import { Icon } from "../components/icons";
 import { RecipePhoto, Tag, formatTime } from "../components/recipe-ui";
 import { MONTHS } from "@/lib/seasons-data";
@@ -36,9 +47,17 @@ type IngredientRow = {
   quantity: string;
   unit: string;
   isPrimary: boolean;
+  // True once the user set the unit (typed or picked), so selecting an
+  // ingredient won't overwrite it with the ingredient's default unit.
+  unitTouched: boolean;
 };
 type UtensilRow = { key: number; name: string; quantity: string };
 type StepRow = { key: number; value: string };
+
+// Catalog options fed to the comboboxes. Ingredients carry their default unit
+// (auto-filled on select) and a derived "incomplete" flag (drives the badge).
+export type IngredientOption = { name: string; defaultUnit: string | null; incomplete: boolean };
+export type UnitOption = { name: string; abbreviation: string | null };
 
 export type RecipeFormValues = {
   title: string;
@@ -224,8 +243,8 @@ export function RecipeForm({
   action: (prev: FormState, formData: FormData) => Promise<FormState>;
   defaultValues?: RecipeFormValues;
   submitLabel: string;
-  ingredientOptions: string[];
-  unitOptions: string[];
+  ingredientOptions: IngredientOption[];
+  unitOptions: UnitOption[];
   utensilOptions: string[];
   tagOptions: string[];
   categoryOptions: string[];
@@ -290,14 +309,14 @@ export function RecipeForm({
     : [{ name: "", quantity: "", unit: "", isPrimary: false }];
   const keyCounter = useRef(initialRows.length);
   const [rows, setRows] = useState<IngredientRow[]>(
-    initialRows.map((r, i) => ({ key: i, isPrimary: false, ...r })),
+    initialRows.map((r, i) => ({ key: i, isPrimary: false, unitTouched: !!r.unit, ...r })),
   );
   const updateRow = (key: number, patch: Partial<IngredientRow>) =>
     setRows((rs) => rs.map((r) => (r.key === key ? { ...r, ...patch } : r)));
   const addRow = () =>
     setRows((rs) => [
       ...rs,
-      { key: keyCounter.current++, name: "", quantity: "", unit: "", isPrimary: false },
+      { key: keyCounter.current++, name: "", quantity: "", unit: "", isPrimary: false, unitTouched: false },
     ]);
   const removeRow = (key: number) =>
     setRows((rs) => (rs.length > 1 ? rs.filter((r) => r.key !== key) : rs));
@@ -356,6 +375,92 @@ export function RecipeForm({
       categories: f.categories.includes(c)
         ? f.categories.filter((x) => x !== c)
         : [...f.categories, c],
+    });
+
+  // --- On-the-fly catalog creation (comboboxes) ---
+  // Catalog options kept in state so entries created on the fly appear at once.
+  const [ingOpts, setIngOpts] = useState<IngredientOption[]>(ingredientOptions);
+  const [unitOpts, setUnitOpts] = useState<UnitOption[]>(unitOptions);
+  const [utenOpts, setUtenOpts] = useState<string[]>(utensilOptions);
+  const [pendingUnit, setPendingUnit] = useState<{ key: number; name: string } | null>(null);
+  const [flash, setFlash] = useState<string | null>(null);
+  const [, startCreate] = useTransition();
+  const toast = (m: string) => {
+    setFlash(m);
+    setTimeout(() => setFlash(null), 3400);
+  };
+
+  const ingredientComboOptions: ComboOption[] = ingOpts.map((o) => ({
+    name: o.name,
+    incomplete: o.incomplete,
+  }));
+  const unitComboOptions: ComboOption[] = unitOpts.map((o) => ({ name: o.name, meta: o.abbreviation }));
+  const utensilComboOptions: ComboOption[] = utenOpts.map((name) => ({ name }));
+  const ingredientTodo = (name: string) =>
+    name.trim() ? (ingOpts.find((o) => o.name === name)?.incomplete ?? false) : false;
+
+  // Ingredient: pick existing → fill name + auto-fill its default unit, unless
+  // the user already set the unit on this row.
+  const pickIngredient = (key: number, name: string) => {
+    const def = ingOpts.find((o) => o.name === name)?.defaultUnit ?? null;
+    setRows((rs) =>
+      rs.map((r) =>
+        r.key === key ? { ...r, name, unit: def && !r.unitTouched ? def : r.unit } : r,
+      ),
+    );
+  };
+  const createIngredient = (key: number, name: string) =>
+    startCreate(async () => {
+      const res = await createIngredientEntry(name);
+      if (!res.ok) {
+        toast(res.error);
+        return;
+      }
+      const entry = res.entry;
+      setIngOpts((os) =>
+        os.some((o) => o.name === entry.name) ? os : [{ ...entry }, ...os],
+      );
+      setRows((rs) =>
+        rs.map((r) =>
+          r.key === key
+            ? { ...r, name: entry.name, unit: entry.defaultUnit && !r.unitTouched ? entry.defaultUnit : r.unit }
+            : r,
+        ),
+      );
+      if (res.reused) toast(`« ${name} » existe déjà — « ${entry.name} » réutilisé.`);
+    });
+
+  // Unit: pick / type → set the unit and mark it touched; "+ Créer" opens the
+  // mini-modal (abbreviation + type) before creating.
+  const confirmUnit = (abbreviation: string, kind: string) => {
+    if (!pendingUnit) return;
+    const { key, name } = pendingUnit;
+    startCreate(async () => {
+      const res = await createUnitEntry({ name, abbreviation, kind });
+      if (!res.ok) {
+        toast(res.error);
+        return;
+      }
+      const entry = res.entry;
+      setUnitOpts((os) => (os.some((o) => o.name === entry.name) ? os : [{ ...entry }, ...os]));
+      updateRow(key, { unit: entry.name, unitTouched: true });
+      setPendingUnit(null);
+      if (res.reused) toast(`« ${name} » existe déjà — « ${entry.name} » réutilisé.`);
+    });
+  };
+
+  // Utensil: "+ Créer" creates in one click.
+  const createUtensil = (key: number, name: string) =>
+    startCreate(async () => {
+      const res = await createUtensilEntry(name);
+      if (!res.ok) {
+        toast(res.error);
+        return;
+      }
+      const entry = res.entry;
+      setUtenOpts((os) => (os.includes(entry.name) ? os : [entry.name, ...os]));
+      updateUtensil(key, { name: entry.name });
+      if (res.reused) toast(`« ${name} » existe déjà — « ${entry.name} » réutilisé.`);
     });
 
   const valid =
@@ -566,15 +671,19 @@ export function RecipeForm({
               <div className="flex flex-col gap-2.5">
                 {utensils.map((row) => (
                   <SortableRow key={row.key} id={row.key} className="flex items-center gap-2.5">
-                    <input
-                      name="utensilName"
-                      list="utensil-options"
-                      placeholder="ex. fouet, moule à tarte, mixeur…"
+                    <FormCombobox
                       value={row.name}
-                      onChange={(e) => updateUtensil(row.key, { name: e.target.value })}
-                      className={`${fieldBase} min-w-0 flex-1`}
-                      autoComplete="off"
+                      kind="uten"
+                      ariaLabel="Ustensile"
+                      placeholder="Rechercher ou créer un ustensile…"
+                      options={utensilComboOptions}
+                      onPick={(name) => updateUtensil(row.key, { name })}
+                      onChange={(text) => updateUtensil(row.key, { name: text })}
+                      onCreate={(name) => createUtensil(row.key, name)}
+                      className="min-w-0 flex-1"
                     />
+                    {/* Custom control → mirror the value for positional submit. */}
+                    <input type="hidden" name="utensilName" value={row.name} />
                     <input
                       name="utensilQuantity"
                       type="number"
@@ -592,11 +701,6 @@ export function RecipeForm({
             </SortableContext>
           </DndContext>
           <AddRowButton onClick={addUtensil}>Ajouter un ustensile</AddRowButton>
-          <datalist id="utensil-options">
-            {utensilOptions.map((o) => (
-              <option key={o} value={o} />
-            ))}
-          </datalist>
         </Block>
 
         {/* 4. Ingredients */}
@@ -626,15 +730,20 @@ export function RecipeForm({
                     id={row.key}
                     className="flex flex-wrap items-center gap-2.5"
                   >
-                    <input
-                      name="ingredientName"
-                      list="ingredient-options"
-                      placeholder="ex. farine"
+                    <FormCombobox
                       value={row.name}
-                      onChange={(e) => updateRow(row.key, { name: e.target.value })}
-                      className={`${fieldBase} min-w-[160px] flex-1`}
-                      autoComplete="off"
+                      kind="ing"
+                      ariaLabel="Ingrédient"
+                      placeholder="Rechercher ou créer…"
+                      options={ingredientComboOptions}
+                      todo={ingredientTodo(row.name)}
+                      onPick={(name) => pickIngredient(row.key, name)}
+                      onChange={(text) => updateRow(row.key, { name: text })}
+                      onCreate={(name) => createIngredient(row.key, name)}
+                      className="min-w-[160px] flex-1"
                     />
+                    {/* Custom control → mirror the value for positional submit. */}
+                    <input type="hidden" name="ingredientName" value={row.name} />
                     <input
                       name="ingredientQuantity"
                       type="number"
@@ -645,10 +754,15 @@ export function RecipeForm({
                       onChange={(e) => updateRow(row.key, { quantity: e.target.value })}
                       className={`${fieldBase} w-24`}
                     />
-                    <UnitCombobox
+                    <FormCombobox
                       value={row.unit}
-                      onChange={(unit) => updateRow(row.key, { unit })}
-                      options={unitOptions}
+                      kind="unit"
+                      ariaLabel="Unité"
+                      placeholder="Unité"
+                      options={unitComboOptions}
+                      onPick={(name) => updateRow(row.key, { unit: name, unitTouched: true })}
+                      onChange={(text) => updateRow(row.key, { unit: text, unitTouched: true })}
+                      onCreate={(name) => setPendingUnit({ key: row.key, name })}
                       className="w-32"
                     />
                     {/* Positional submission: one value per row, per field. */}
@@ -688,11 +802,6 @@ export function RecipeForm({
             Les ingrédients marqués comme principaux (★) sont utilisés pour la détection
             automatique de la saison de la recette.
           </p>
-          <datalist id="ingredient-options">
-            {ingredientOptions.map((o) => (
-              <option key={o} value={o} />
-            ))}
-          </datalist>
         </Block>
 
         {/* 4b. Seasonality */}
@@ -932,6 +1041,27 @@ export function RecipeForm({
           L&apos;aperçu se met à jour pendant que vous remplissez le formulaire.
         </p>
       </aside>
+
+      {/* Mini-modal to create a unit on the fly (abbreviation + type). */}
+      {pendingUnit && (
+        <UnitCreateModal
+          name={pendingUnit.name}
+          onConfirm={confirmUnit}
+          onClose={() => setPendingUnit(null)}
+        />
+      )}
+
+      {/* Transient note (e.g. an entry reused via dedupe). */}
+      {flash && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-5 left-1/2 z-50 flex max-w-[min(92vw,460px)] -translate-x-1/2 items-center gap-2 rounded-input bg-ink px-4 py-2.5 text-sm text-surface shadow-card-lg"
+        >
+          <Icon name="check" size={16} strokeWidth={2.2} />
+          {flash}
+        </div>
+      )}
     </form>
   );
 }

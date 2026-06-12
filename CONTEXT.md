@@ -143,9 +143,18 @@ rendering, which these pages already are).
 - **Client Components** (`"use client"`) only where interactivity is needed: search
   controls, servings stepper, checkable steps, the dynamic form, the live preview.
   Drag-and-drop reordering of ingredients/utensils/steps uses **dnd-kit**. The
-  ingredient unit is an editable combobox (`unit-combobox.tsx`, catalog + free value);
-  forms submit via **positional inputs** (multiple same-named fields read by index in
-  `actions.ts`), so combobox values are mirrored into hidden inputs.
+  ingredient / unit / utensil fields use a shared accessible combobox
+  (`form-combobox.tsx`, `role="combobox"` + keyboard nav) with **on-the-fly catalog
+  creation**: when the typed value matches no option, a "+ Créer « … »" row creates the
+  entry via a Server Action (`catalog-actions.ts`), deduping accent-insensitively /
+  plural-tolerantly (`fuzzyKey` in `lib/seasons-data`) and reusing a close match instead
+  of duplicating. New ingredients/utensils keep their fields null → they surface as
+  "À compléter" in `/parametres` (status derived). Creating a **unit** opens a mini-modal
+  (abbreviation + type). Selecting an existing ingredient **auto-fills its default unit**
+  (`Ingredient.defaultUnit`) unless the user already set the unit on that row. Forms
+  submit via **positional inputs** (multiple same-named fields read by index in
+  `actions.ts`); custom controls mirror their value into hidden inputs, and the recipe
+  submit reconciles the catalog links via `connectOrCreate` (no duplicates).
 - **Media**: `lib/media.ts` exposes a `MediaStore` (`upload`/`remove`). Cloudinary is the
   current backend (signed REST, no SDK); designed to add a local backend later. Degrades
   to gradient placeholders when `CLOUDINARY_*` is unset.
@@ -183,7 +192,9 @@ rendering, which these pages already are).
 - `app/components/theme.ts` + `theme-script.tsx` — theme/accent tokens + the
   before-paint bootstrap (applies the saved preference, no FOUC).
 - `app/recettes/` — `page.tsx` (list/search), `home-screen` (search UI), `recipe-detail`,
-  `recipe-form` (+ `step-editor`, `tags-combobox`), `actions.ts`, `[slug]/`, `nouvelle/`.
+  `recipe-form` (+ `step-editor`, `tags-combobox`, `form-combobox` = shared combobox +
+  unit-create modal), `actions.ts`, `catalog-actions.ts` (on-the-fly catalog creation),
+  `[slug]/`, `nouvelle/`.
 - `app/components/` — `icons`, `recipe-ui` (Photo/Tag/Difficulty/helpers), `recipe-card`
   (Magazine card), `top-bar`, `mobile-tab-bar` (bottom nav + "Plus" sheet),
   `nav-more-menu` (desktop "Plus" dropdown), `nav-data` (shared secondary-nav data),

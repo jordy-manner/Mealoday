@@ -94,6 +94,15 @@ const deplural = (s: string) =>
     .map((w) => (w.length > 3 && w.endsWith("s") ? w.slice(0, -1) : w))
     .join(" ");
 
+/**
+ * Canonical key for dedupe: accent-insensitive + plural-folded. Two catalog
+ * names that collapse to the same key are considered the same entry (e.g.
+ * "Tomates" / "tomate"). Used by the on-the-fly creation Server Actions.
+ */
+export function fuzzyKey(name: string): string {
+  return deplural(norm(name));
+}
+
 /** True if an ingredient name refers to the given product. */
 export function ingredientMatches(ingredientName: string, product: Produce): boolean {
   const ing = deplural(norm(ingredientName));

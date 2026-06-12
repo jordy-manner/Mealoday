@@ -35,8 +35,11 @@ export default async function EditRecipePage({ params }: Props) {
         recipeSteps: { orderBy: { order: "asc" } },
       },
     }),
-    prisma.ingredient.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
-    prisma.unit.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
+    prisma.ingredient.findMany({
+      orderBy: { name: "asc" },
+      select: { name: true, aisle: true, defaultUnitId: true, defaultUnit: { select: { name: true } } },
+    }),
+    prisma.unit.findMany({ orderBy: { name: "asc" }, select: { name: true, abbreviation: true } }),
     prisma.utensil.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
     prisma.tag.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
     prisma.category.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
@@ -65,8 +68,12 @@ export default async function EditRecipePage({ params }: Props) {
       <RecipeForm
         action={action}
         submitLabel="Enregistrer"
-        ingredientOptions={ingredients.map((i) => i.name)}
-        unitOptions={units.map((u) => u.name)}
+        ingredientOptions={ingredients.map((i) => ({
+          name: i.name,
+          defaultUnit: i.defaultUnit?.name ?? null,
+          incomplete: !i.defaultUnitId || !i.aisle,
+        }))}
+        unitOptions={units.map((u) => ({ name: u.name, abbreviation: u.abbreviation }))}
         utensilOptions={utensils.map((u) => u.name)}
         tagOptions={tags.map((t) => t.name)}
         categoryOptions={categories.map((c) => c.name)}

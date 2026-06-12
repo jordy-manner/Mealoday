@@ -2,6 +2,29 @@
 
 All notable changes to the project, by release. Versions follow the `vMAJOR.MINOR.PATCH` format; each release maps to a git tag and a Vercel Preview/Production deployment.
 
+## [v0.2.19] — 2026-06-12
+
+- **On-the-fly catalog creation in the recipe form**: the ingredient / unit /
+  utensil fields now use a shared accessible combobox (`form-combobox.tsx`,
+  `role="combobox"` + `aria-activedescendant`, arrow/Enter/Escape, click-outside)
+  that appends a "+ Créer « … »" row when the typed value matches no option.
+  - **Ingredient**: "+ Créer" creates immediately (name suffices) and shows an
+    "à compléter" badge (derived: missing default unit / aisle). Selecting an
+    existing ingredient **auto-fills its default unit** (`Ingredient.defaultUnit`)
+    unless the row's unit was already set.
+  - **Unit**: "+ Créer" opens a mini-modal (`role="dialog"`, focus-trap, Escape,
+    focus return) for the abbreviation (= the typed value, editable) + type
+    (default "Quantité").
+  - **Utensil**: "+ Créer" creates in one click.
+- Creation goes through Zod-validated Server Actions (`catalog-actions.ts`) that
+  **dedupe** accent-insensitively / plural-tolerantly (`fuzzyKey` in
+  `lib/seasons-data`) and **reuse** a close existing entry instead of duplicating
+  (with a toast). Creation is optimistic; the recipe submit reconciles links via
+  `connectOrCreate`. New entries surface as "À compléter" in `/parametres`
+  (status stays derived). Replaces the standalone lot-3 demo — everything lives in
+  the real form. `unit-combobox.tsx` (Headless UI) is replaced by the shared
+  combobox. No schema change (`Ingredient.defaultUnitId` already exists).
+
 ## [v0.2.18] — 2026-06-12
 
 - **Settings page (`/parametres`)**: a side-rail shell (grouped Préférences /
