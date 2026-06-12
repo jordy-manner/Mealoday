@@ -71,7 +71,7 @@ User-facing routes are **in French**; the REST API stays `/api/recipes`.
 Shared list helpers (`cardInclude`, `toCard`, `MagazineGrid`, `SectionHead`,
 `EmptyState`, `CardRow`) live in `app/recettes/_shared.tsx`, used by both pages.
 
-**Navigation** is responsive. On **desktop** (≥ sm) the sticky `TopBar` holds the
+**Navigation** is responsive. On **desktop** (≥ sm) the fixed `TopBar` holds the
 nav (Accueil / Recettes / Saisons), a search shortcut and the "Créer une recette"
 CTA. On **mobile** (< sm) the top bar collapses to logo + a search icon, and a
 fixed bottom **tab bar** (`MobileTabBar`, client) takes over: Accueil · Recettes ·
@@ -81,12 +81,12 @@ fixed bar never hides the footer/content.
 
 **Pinned-chrome invariant (all pages).** Both bars live in the **root layout**
 (`app/layout.tsx`), so on **every** page the header is pinned to the top (`TopBar`,
-`sticky top-0 z-40`) and, on mobile, the tab bar is pinned to the bottom
-(`MobileTabBar`, `fixed bottom-0 z-40`) — from first paint and throughout scroll,
-on the home, catalogue, recipe detail/edit/create, `/saisons`, and the stub pages
-alike. Keep these two components in the root layout (never per-page) so the
-behaviour stays uniform; the `<body>`'s `pb-[…] sm:pb-0` reserves space for the
-bottom bar.
+`fixed inset-x-0 top-0 z-40`) and, on mobile, the tab bar is pinned to the bottom
+(`MobileTabBar`, `fixed inset-x-0 bottom-0 z-40`) — from first paint and throughout
+scroll, on the home, catalogue, recipe detail/edit/create, `/saisons`, and the stub
+pages alike. Keep these two components in the root layout (never per-page) so the
+behaviour stays uniform; because both are `fixed`, the `<body>` reserves space with
+`pt-[68px]` (header height, all viewports) and `pb-[…] sm:pb-0` (mobile tab bar).
 
 ## Architecture
 - **Reads** = Server Components querying Prisma directly (`export const dynamic = "force-dynamic"`).

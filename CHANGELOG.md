@@ -2,6 +2,15 @@
 
 All notable changes to the project, by release. Versions follow the `vMAJOR.MINOR.PATCH` format; each release maps to a git tag and a Vercel Preview/Production deployment.
 
+## [v0.2.11] — 2026-06-12
+
+- The header (`TopBar`) is now **`fixed`** (was `sticky`) like the mobile bottom
+  tab bar; `<body>` gains `pt-[68px]` to reserve the header height on all
+  viewports. Both nav bars are now truly pinned on every page.
+- Fix: on mobile the **difficulty filter** overflowed its row — the filter group
+  is now `flex-wrap`, so the buttons (Toutes / Facile / Moyen / Difficile) wrap
+  instead of overflowing.
+
 ## [v0.2.10] — 2026-06-12
 
 - Docs: document the **pinned-chrome invariant** in `CONTEXT.md` — the header

@@ -53,9 +53,10 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${newsreader.variable} ${hanken.variable} ${splineMono.variable} h-full`}
     >
-      {/* pb on mobile clears the fixed bottom tab bar (footer included). */}
+      {/* pt clears the fixed header (68px, all viewports); pb on mobile clears
+          the fixed bottom tab bar (footer included). */}
       <body
-        className="flex min-h-full flex-col pb-[76px] sm:pb-0"
+        className="flex min-h-full flex-col pt-[68px] pb-[76px] sm:pb-0"
         suppressHydrationWarning
       >
         <TopBar />

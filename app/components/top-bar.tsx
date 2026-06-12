@@ -33,7 +33,7 @@ export function TopBar() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line-soft bg-bg/[0.88] backdrop-blur-[12px]">
+    <header className="fixed inset-x-0 top-0 z-40 border-b border-line-soft bg-bg/[0.88] backdrop-blur-[12px]">
       <div className="mx-auto flex h-[68px] w-full max-w-content items-center gap-4 px-[18px] sm:gap-7 sm:px-8">
         <Link href="/" className="shrink-0">
           <Brand />

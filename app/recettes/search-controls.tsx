@@ -203,7 +203,7 @@ function FilterGroup({
   onChange: (v: number) => void;
 }) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center gap-2">
       <span className="mr-0.5 text-[12px] font-bold uppercase tracking-wider text-ink-faint">
         {label}
       </span>
