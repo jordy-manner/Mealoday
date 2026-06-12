@@ -2,6 +2,18 @@
 
 All notable changes to the project, by release. Versions follow the `vMAJOR.MINOR.PATCH` format; each release maps to a git tag and a Vercel Preview/Production deployment.
 
+## [v0.2.15] — 2026-06-12
+
+- **Desktop nav revamp**: the secondary destinations (Menu de la semaine, Liste de
+  courses, Favoris, Paramètres) are now reachable on desktop via a **"Plus"
+  dropdown** (`DesktopMoreMenu`), mirroring the mobile bottom sheet. Both share a
+  single source (`app/components/nav-data.ts`). Nav links gain icons (Recettes
+  `book`, Saisons new `sun` icon — distinct from the `calendar` of "Menu de la
+  semaine", used on mobile too). Removed the desktop "Accueil" link (logo) and the
+  desktop "Rechercher" button. The dropdown handles click-outside / Escape / arrow
+  keys / close-on-navigation, with `role="menu"` a11y. Mobile is unchanged beyond the
+  shared data and the Saisons icon swap.
+
 ## [v0.2.14] — 2026-06-12
 
 - **Carbon footprint back on `/saisons`**, now from a committed **ADEME Agribalyse**

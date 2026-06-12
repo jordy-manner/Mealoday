@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Icon, type IconName } from "./icons";
+import { SHEET_GROUPS, SHEET_ROUTES } from "./nav-data";
 
 // Mobile-only navigation (hidden ≥ sm): a fixed bottom tab bar with a raised
 // center "Créer" action, plus a "Plus" tab opening a bottom sheet for the
@@ -14,29 +15,8 @@ type Tab = { label: string; href: string; icon: IconName };
 const TABS: Tab[] = [
   { label: "Accueil", href: "/", icon: "home" },
   { label: "Recettes", href: "/recettes", icon: "book" },
-  { label: "Saisons", href: "/saisons", icon: "calendar" },
+  { label: "Saisons", href: "/saisons", icon: "sun" },
 ];
-
-type SheetItem = { label: string; href: string; icon: IconName };
-
-const SHEET_GROUPS: { title: string; items: SheetItem[] }[] = [
-  {
-    title: "Organiser",
-    items: [
-      { label: "Menu de la semaine", href: "/menu-semaine", icon: "calendar" },
-      { label: "Liste de courses", href: "/liste-courses", icon: "cart" },
-    ],
-  },
-  {
-    title: "Mon espace",
-    items: [
-      { label: "Favoris", href: "/favoris", icon: "heart" },
-      { label: "Paramètres", href: "/parametres", icon: "sliders" },
-    ],
-  },
-];
-
-const SHEET_ROUTES = SHEET_GROUPS.flatMap((g) => g.items.map((i) => i.href));
 
 /** Active tab. Order matters: "/recettes/nouvelle" belongs to Créer, not Recettes. */
 function tabActive(pathname: string, href: string): boolean {

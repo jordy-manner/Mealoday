@@ -71,13 +71,16 @@ User-facing routes are **in French**; the REST API stays `/api/recipes`.
 Shared list helpers (`cardInclude`, `toCard`, `MagazineGrid`, `SectionHead`,
 `EmptyState`, `CardRow`) live in `app/recettes/_shared.tsx`, used by both pages.
 
-**Navigation** is responsive. On **desktop** (≥ sm) the fixed `TopBar` holds the
-nav (Accueil / Recettes / Saisons), a search shortcut and the "Créer une recette"
-CTA. On **mobile** (< sm) the top bar collapses to logo + a search icon, and a
-fixed bottom **tab bar** (`MobileTabBar`, client) takes over: Accueil · Recettes ·
-**Créer** (raised center) · Saisons · **Plus**. "Plus" opens a bottom sheet with
-the secondary destinations. The `<body>` carries a bottom padding on mobile so the
-fixed bar never hides the footer/content.
+**Navigation** is responsive. On **desktop** (≥ sm) the fixed `TopBar` holds icon
+nav links (Recettes `book` / Saisons `sun`), a **"Plus" dropdown** (`DesktopMoreMenu`,
+client popover: toggle, click-outside, Escape, ↑/↓, `role="menu"`) and the "Créer
+une recette" CTA; Accueil is reached via the logo. On **mobile** (< sm) the top bar
+collapses to logo + a search icon, and a fixed bottom **tab bar** (`MobileTabBar`,
+client) takes over: Accueil · Recettes · **Créer** (raised center) · Saisons ·
+**Plus**. "Plus" opens a bottom sheet. The secondary destinations (Menu de la
+semaine, Liste de courses, Favoris, Paramètres) are a **single source** shared by
+both — `app/components/nav-data.ts` (`SHEET_GROUPS` / `SHEET_ROUTES`). The `<body>`
+carries a bottom padding on mobile so the fixed bar never hides the footer/content.
 
 **Pinned-chrome invariant (all pages).** Both bars live in the **root layout**
 (`app/layout.tsx`), so on **every** page the header is pinned to the top (`TopBar`,
@@ -128,6 +131,7 @@ behaviour stays uniform; because both are `fixed`, the `<body>` reserves space w
   `recipe-form` (+ `step-editor`, `tags-combobox`), `actions.ts`, `[slug]/`, `nouvelle/`.
 - `app/components/` — `icons`, `recipe-ui` (Photo/Tag/Difficulty/helpers), `recipe-card`
   (Magazine card), `top-bar`, `mobile-tab-bar` (bottom nav + "Plus" sheet),
+  `nav-more-menu` (desktop "Plus" dropdown), `nav-data` (shared secondary-nav data),
   `coming-soon` (stub page), `loader` (page-transition logo loader), `site-footer`.
 - `app/loading.tsx` — root navigation fallback (Suspense): renders `<Loader>` in the
   content area during route transitions that actually suspend (the nav chrome stays).
