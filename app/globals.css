@@ -63,6 +63,8 @@
   --animate-breathe: breathe 1.7s ease-in-out infinite;
   --animate-halo: halo 1.7s ease-out infinite;
   --animate-dot: dot 1s ease-in-out infinite;
+  /* Widgets — timer alert: accent ring pulse on a ringing timer / popin. */
+  --animate-flash: flash-ring 0.85s ease-in-out infinite;
 }
 
 @keyframes fade-up {
@@ -141,6 +143,15 @@
   50% {
     transform: translateY(-5px);
     opacity: 1;
+  }
+}
+
+/* Widgets — accent ring pulse (ringing timer pill / flashing popin). */
+@keyframes flash-ring {
+  50% {
+    box-shadow:
+      var(--shadow-card-lg),
+      0 0 0 4px var(--color-accent);
   }
 }
 

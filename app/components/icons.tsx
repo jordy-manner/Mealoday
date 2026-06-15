@@ -94,6 +94,27 @@ const paths: Record<string, ReactNode> = {
       <path d="M3 13l9 5 9-5M3 18l9 5 9-5" />
     </>
   ),
+  timer: (
+    <>
+      <circle cx="12" cy="13" r="8" />
+      <path d="M12 13V9M9 2h6M19 5l-1.5 1.5" />
+    </>
+  ),
+  egg: <path d="M12 3c3.5 0 6 5.5 6 9.5a6 6 0 0 1-12 0C6 8.5 8.5 3 12 3Z" />,
+  play: <path d="M7 5l12 7-12 7V5Z" fill="currentColor" stroke="none" />,
+  pause: (
+    <>
+      <rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor" stroke="none" />
+      <rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor" stroke="none" />
+    </>
+  ),
+  scale: <path d="M12 3v18M7 7h10M7 7l-3 6a3 3 0 0 0 6 0L7 7M17 7l-3 6a3 3 0 0 0 6 0l-3-6" />,
+  note: (
+    <>
+      <path d="M5 3h10l4 4v14H5zM15 3v4h4" />
+      <path d="M8 11h8M8 15h5" />
+    </>
+  ),
   grip: <path d="M4 6h16M4 12h16M4 18h16" />,
   menu: <path d="M3 6h18M3 12h18M3 18h18" />,
   home: (

@@ -5,6 +5,7 @@ import "./globals.css";
 import { TopBar } from "./components/top-bar";
 import { Breadcrumb } from "./components/breadcrumb";
 import { MobileTabBar } from "./components/mobile-tab-bar";
+import { WidgetsDock } from "./components/widgets-dock";
 import { SiteFooter } from "./components/site-footer";
 import { ThemeScript } from "./components/theme-script";
 import { getNotifications } from "@/lib/notifications";
@@ -77,6 +78,8 @@ export default async function RootLayout({
         <div className="flex-1">{children}</div>
         <SiteFooter />
         <MobileTabBar notifCount={notif.todoCount} />
+        {/* Floating kitchen-widgets dock (global chrome, like the notif bell). */}
+        <WidgetsDock />
       </body>
     </html>
   );

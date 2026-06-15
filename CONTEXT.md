@@ -165,6 +165,20 @@ wrapped in React `cache()`) computes the list + per-section counts once per requ
 root layout passes them to the bell + the mobile "Plus" badge, and the `/parametres`
 layout reuses the same counts for the **rail dots** (Ingrédients / Unités).
 
+**Widgets dock ("Widgets").** A floating kitchen-widgets launcher (`WidgetsDock`,
+client, mounted in the **root layout** → present on every page, like the bell).
+A round FAB (bottom-right; bottom-left clear of the mobile tab bar) expands a
+**registry** of widgets (`{ id, name, desc, icon, soon? }` — today `timer` active;
+`convert`/`portions`/`notes` shown disabled "à venir"); each opens in a reusable
+**popin** (bottom-sheet on mobile). First widget = a **multi-timer**: a Simple
+mode (min/sec steppers + presets) and an **egg-cooking** mode (boiling-water
+plunge; live time from a calibrated table doneness×size + cold-fridge +60 s +
+`(n−4)×15 s`). Timers run in parallel (250 ms tick), minimize to floating **pills**
+with a progress ring + a count **badge** on the FAB, and on completion **beep**
+(WebAudio) + **vibrate** + flash the popin ("À retirer !"). Living in the layout,
+timers survive SPA navigation (no localStorage). A11y: `aria-expanded` FAB,
+`role="menu"`, popin `role="dialog"` + focus-trap + Escape + click-outside.
+
 **Pinned-chrome invariant (all pages).** Both bars live in the **root layout**
 (`app/layout.tsx`), so on **every** page the header is pinned to the top (`TopBar`,
 `fixed inset-x-0 top-0 z-40`) and, on mobile, the tab bar is pinned to the bottom
@@ -259,6 +273,7 @@ rendering, which these pages already are).
   (Magazine card), `top-bar`, `mobile-tab-bar` (bottom nav + "Plus" sheet),
   `nav-more-menu` (desktop "Plus" dropdown), `nav-data` (shared secondary-nav data),
   `breadcrumb` (global server breadcrumb, ≥ sm), `notif-bell` (notification bell + panel),
+  `widgets-dock` (floating kitchen-widgets dock + timer engine, client, in the root layout),
   `coming-soon` (stub page), `loader` (page-transition logo loader), `site-footer`.
 - `lib/notifications.ts` — `getNotifications()` (cache()'d): derived "À traiter" signals +
   per-section counts, consumed by the bell, the mobile "Plus" badge, and the settings rail.

@@ -2,6 +2,24 @@
 
 All notable changes to the project, by release. Versions follow the `vMAJOR.MINOR.PATCH` format; each release maps to a git tag and a Vercel Preview/Production deployment.
 
+## [v0.2.28] — 2026-06-15
+
+- **Kitchen widgets dock** (design handoff `widgets`): a floating launcher
+  (`WidgetsDock`) mounted in the root layout (global chrome, like the notif bell).
+  A round FAB expands an extensible **widget registry** (today `timer` active;
+  `convert`/`portions`/`notes` shown disabled "à venir"); each opens in a reusable
+  popin (bottom-sheet on mobile).
+- **Timer widget**: Simple mode (min/sec steppers + 1/3/5/10 presets) and an
+  **egg-cooking** mode (boiling-water plunge) with a calibrated time table
+  (doneness × size + cold-fridge +60 s + `(n−4)×15 s`), recomputed live. Multiple
+  timers run in parallel (250 ms tick), minimize to floating **pills** with a
+  progress ring + a count badge on the FAB, and on completion **beep** (WebAudio)
+  + **vibrate** + flash the popin ("À retirer !"). Mounted in the layout, timers
+  survive SPA navigation. A11y: `aria-expanded`, `role="menu"`, popin
+  `role="dialog"` + focus-trap + Escape + click-outside; `prefers-reduced-motion`.
+- Add `timer`/`egg`/`play`/`pause`/`scale`/`note` icons and a `flash-ring`
+  keyframe (`animate-flash`) for the timer alert.
+
 ## [v0.2.27] — 2026-06-15
 
 - **Design system formalised** (design handoff `design_system`): add **`DESIGN.md`**
