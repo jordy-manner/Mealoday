@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "../components/icons";
 import { RecipeCard, type RecipeCardData } from "../components/recipe-card";
 import { Dropdown } from "./dropdown";
+import { FilterDisclosure } from "../components/filter-disclosure";
 import { MonthSelect } from "./month-select";
 import { ProduceList, type SeasonView } from "./produce-list";
 import { MONTHS, type Produce, type ProduceCategory } from "@/lib/seasons-data";
@@ -65,7 +66,6 @@ export function SeasonsBrowser({
   );
   const [sort, setSort] = useState(initial.sort === "carbone" ? "carbone" : "az");
   const [view, setView] = useState<SeasonView>(initial.view);
-  const [filtersOpen, setFiltersOpen] = useState(false);
 
   // Reflect the (interactive) state into the URL for shareable/back-able links —
   // but skip the first run so a clean initial URL isn't rewritten on mount.
@@ -195,89 +195,71 @@ export function SeasonsBrowser({
         </div>
       </section>
 
-      {/* Removable filters panel */}
+      {/* Removable filters panel (shared FilterDisclosure pill + panel) */}
       <section className="pb-8">
-        <div className="sticky top-[68px] z-10 sm:static">
-          <button
-            type="button"
-            onClick={() => setFiltersOpen((v) => !v)}
-            aria-expanded={filtersOpen}
-            className={`inline-flex w-full items-center gap-2.5 rounded-input border px-4 py-2.5 text-[14.5px] font-semibold transition sm:w-auto ${
-              filtersOpen ? "border-ink-faint bg-surface" : "border-line bg-surface hover:border-ink-faint"
-            }`}
-          >
-            <Icon name="filter" size={17} className="text-ink-soft" /> Filtres
-            <span className="font-normal text-ink-faint">
+        <FilterDisclosure
+          sticky
+          count={activeCount}
+          summary={
+            <>
               {selLabel}
               {catLabel ? ` · ${catLabel}` : ""}
-            </span>
-            {activeCount > 0 && (
-              <span className="grid h-5 min-w-5 place-items-center rounded-full bg-accent px-1.5 font-mono text-[11px] font-bold text-white">
-                {activeCount}
-              </span>
-            )}
-            <Icon
-              name="chevron"
-              size={14}
-              className={`ml-auto rotate-90 text-ink-faint transition-transform sm:ml-1 ${filtersOpen ? "-rotate-90" : ""}`}
-            />
-          </button>
+            </>
+          }
+        >
+          <div className="flex flex-col gap-5">
+            <MonthSelect months={months} setMonths={setMonths} currentMonth={currentMonth} />
 
-          {filtersOpen && (
-            <div className="mt-3 flex flex-col gap-5 rounded-card border border-line bg-surface p-4 shadow-card sm:p-5">
-              <MonthSelect months={months} setMonths={setMonths} currentMonth={currentMonth} />
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-line-soft pt-4">
+              {/* Categories — chips on desktop, custom dropdown on mobile */}
+              <div className="hidden flex-wrap gap-2 sm:flex">
+                {CATS.map((c) => {
+                  const on = category === c.key;
+                  return (
+                    <button
+                      key={c.key}
+                      type="button"
+                      aria-pressed={on}
+                      onClick={() => setCategory(c.key)}
+                      className={`inline-flex items-center gap-1.5 rounded-full border px-[15px] py-2 text-[14px] font-semibold transition ${
+                        on
+                          ? "border-transparent bg-accent-soft text-accent-ink"
+                          : "border-line bg-surface text-ink-soft hover:border-ink-faint hover:text-ink"
+                      }`}
+                    >
+                      {c.label}
+                      <span className="font-mono text-[11.5px] opacity-70">{counts[c.key]}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="w-full sm:hidden">
+                <Dropdown
+                  ariaLabel="Filtrer par catégorie"
+                  tone="ink"
+                  value={category}
+                  onChange={setCategory}
+                  options={CATS.map((c) => ({ value: c.key, label: c.label, count: counts[c.key] }))}
+                />
+              </div>
 
-              <div className="flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-line-soft pt-4">
-                {/* Categories — chips on desktop, custom dropdown on mobile */}
-                <div className="hidden flex-wrap gap-2 sm:flex">
-                  {CATS.map((c) => {
-                    const on = category === c.key;
-                    return (
-                      <button
-                        key={c.key}
-                        type="button"
-                        aria-pressed={on}
-                        onClick={() => setCategory(c.key)}
-                        className={`inline-flex items-center gap-1.5 rounded-full border px-[15px] py-2 text-[14px] font-semibold transition ${
-                          on
-                            ? "border-ink bg-ink text-bg"
-                            : "border-line bg-surface text-ink-soft hover:border-ink-faint hover:text-ink"
-                        }`}
-                      >
-                        {c.label}
-                        <span className="font-mono text-[11.5px] opacity-70">{counts[c.key]}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-                <div className="w-full sm:hidden">
-                  <Dropdown
-                    ariaLabel="Filtrer par catégorie"
-                    tone="ink"
-                    value={category}
-                    onChange={setCategory}
-                    options={CATS.map((c) => ({ value: c.key, label: c.label, count: counts[c.key] }))}
-                  />
-                </div>
-
-                <div className="flex items-center gap-2 sm:ml-auto">
-                  <span className="font-mono text-[12.5px] font-bold uppercase tracking-wider text-ink-faint">
-                    Trier
-                  </span>
-                  <select
-                    value={sort}
-                    onChange={(e) => setSort(e.target.value)}
-                    aria-label="Trier les produits"
-                    className="select-chevron rounded-full border border-line bg-surface py-2 pl-3.5 text-[13.5px] font-semibold text-ink outline-none"
-                  >
-                    <option value="az">A → Z</option>
-                    <option value="carbone">Empreinte carbone ↑</option>
-                  </select>
-                </div>
+              <div className="flex items-center gap-2 sm:ml-auto">
+                <span className="font-mono text-[12.5px] font-bold uppercase tracking-wider text-ink-faint">
+                  Trier
+                </span>
+                <select
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value)}
+                  aria-label="Trier les produits"
+                  className="select-chevron rounded-full border border-line bg-surface py-2 pl-3.5 text-[13.5px] font-semibold text-ink outline-none"
+                >
+                  <option value="az">A → Z</option>
+                  <option value="carbone">Empreinte carbone ↑</option>
+                </select>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        </FilterDisclosure>
       </section>
 
       {/* Produce list */}

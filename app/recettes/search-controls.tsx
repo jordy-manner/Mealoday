@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { Icon } from "../components/icons";
+import { FilterDisclosure } from "../components/filter-disclosure";
 
 const TIME_OPTIONS = [
   { v: 0, l: "Tous" },
@@ -35,6 +36,16 @@ export function SearchControls({ categories }: { categories: string[] }) {
   const cat = sp.get("cat");
   const maxTime = Number(sp.get("t") ?? "0");
   const diff = Number(sp.get("d") ?? "0");
+
+  // Summary + count of active filters (category / time / difficulty), shown on
+  // the "Filtres" pill. Search + ingredient toggle aren't counted here.
+  const activeParts = [
+    cat || null,
+    TIME_OPTIONS.find((o) => o.v === maxTime && o.v !== 0)?.l ?? null,
+    DIFF_OPTIONS.find((o) => o.v === diff && o.v !== 0)?.l ?? null,
+  ].filter(Boolean) as string[];
+  const activeCount = activeParts.length;
+  const summary = activeParts.length ? activeParts.join(" · ") : "Tous";
 
   const [text, setText] = useState(q);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -145,47 +156,63 @@ export function SearchControls({ categories }: { categories: string[] }) {
         </button>
       </div>
 
-      {/* Category chips */}
-      {categories.length > 0 && (
-        <div className="mt-[26px] flex flex-wrap gap-2.5">
-          {categories.map((c) => {
-            const on = cat === c;
-            return (
-              <button
-                key={c}
-                type="button"
-                onClick={() => navigate({ cat: on ? null : c })}
-                aria-pressed={on}
-                className={`whitespace-nowrap rounded-full border px-[18px] py-2.5 text-[14px] font-semibold transition ${
-                  on
-                    ? "border-ink bg-ink text-bg"
-                    : "border-line bg-surface text-ink-soft hover:border-ink-faint hover:text-ink"
-                }`}
-              >
-                {c}
-              </button>
-            );
-          })}
-        </div>
-      )}
+      {/* Grouped filters: category + time + difficulty in a collapsible panel
+          (same pill/panel as /saisons). Search + ingredient toggle stay above. */}
+      <div className="mt-5">
+        <FilterDisclosure summary={summary} count={activeCount}>
+          <div className="flex flex-col gap-5">
+            {categories.length > 0 && (
+              <div className="flex flex-col gap-2.5">
+                <span className="text-[12px] font-bold uppercase tracking-wider text-ink-faint">
+                  Catégorie
+                </span>
+                <div className="flex flex-wrap gap-2.5">
+                  {categories.map((c) => {
+                    const on = cat === c;
+                    return (
+                      <button
+                        key={c}
+                        type="button"
+                        onClick={() => navigate({ cat: on ? null : c })}
+                        aria-pressed={on}
+                        className={`whitespace-nowrap rounded-full border px-[18px] py-2.5 text-[14px] font-semibold transition ${
+                          on
+                            ? "border-ink bg-ink text-bg"
+                            : "border-line bg-surface text-ink-soft hover:border-ink-faint hover:text-ink"
+                        }`}
+                      >
+                        {c}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
-      {/* Filter bar (always visible, on the home and the catalogue) */}
-      <div className="mt-2 flex flex-wrap items-center gap-x-6 gap-y-3 rounded-card border border-line-soft bg-surface px-5 py-3.5 shadow-card">
-        <span className="inline-flex items-center gap-2 text-[14px] font-bold">
-          <Icon name="filter" size={16} /> Filtres
-        </span>
-        <FilterGroup
-          label="Temps"
-          options={TIME_OPTIONS}
-          value={maxTime}
-          onChange={(v) => navigate({ t: v ? String(v) : null })}
-        />
-        <FilterGroup
-          label="Difficulté"
-          options={DIFF_OPTIONS}
-          value={diff}
-          onChange={(v) => navigate({ d: v ? String(v) : null })}
-        />
+            <FilterGroup
+              label="Temps"
+              options={TIME_OPTIONS}
+              value={maxTime}
+              onChange={(v) => navigate({ t: v ? String(v) : null })}
+            />
+            <FilterGroup
+              label="Difficulté"
+              options={DIFF_OPTIONS}
+              value={diff}
+              onChange={(v) => navigate({ d: v ? String(v) : null })}
+            />
+
+            {activeCount > 0 && (
+              <button
+                type="button"
+                onClick={() => navigate({ cat: null, t: null, d: null })}
+                className="self-start text-[13.5px] font-semibold text-accent-ink underline underline-offset-2 hover:text-accent"
+              >
+                Tout effacer
+              </button>
+            )}
+          </div>
+        </FilterDisclosure>
       </div>
     </>
   );

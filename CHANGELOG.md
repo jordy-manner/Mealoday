@@ -2,6 +2,21 @@
 
 All notable changes to the project, by release. Versions follow the `vMAJOR.MINOR.PATCH` format; each release maps to a git tag and a Vercel Preview/Production deployment.
 
+## [v0.3.5] — 2026-06-16
+
+- **Grouped filters** (design handoff `filters_gemini`): on the home and the
+  catalogue, the search box + "by ingredient" toggle stay visible, but
+  **category / time / difficulty** now live in a collapsible **"Filtres"**
+  disclosure — a new shared `FilterDisclosure` component (adaptive pill with
+  active-filter summary + count badge + "Tout effacer", isolated panel below),
+  the same pill/panel pattern now also used by `/saisons` (mutualised). URL
+  filtering (`?q&cat&t&d&ing`) unchanged.
+- **`/saisons` consistency**: the product-type chips (Tout/Fruits/Légumes/…) use
+  the season-shortcut style — active in `accent-soft`/`accent-ink` with a
+  transparent border (instead of the ink fill); counts kept.
+- **Scan gating polish**: the disabled "Scanner une photo" card now shows a lock
+  icon alongside "Clé requise" (gating itself shipped in v0.3.3).
+
 ## [v0.3.4] — 2026-06-16
 
 - **Web import — Gemini-assisted parsing**: when a Gemini key is configured,

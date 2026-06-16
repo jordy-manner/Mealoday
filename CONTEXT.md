@@ -218,7 +218,10 @@ rendering, which these pages already are).
   scoring, category/time/difficulty filters); accent-insensitive thanks to the Postgres
   `unaccent` extension. The interactive controls are a small Client Component that updates
   the URL; results render on the server. The keyword search runs **as you type** (debounced,
-  `router.replace`, no submit button); filters and category chips are always visible.
+  `router.replace`, no submit button). The search box + the "by ingredient" toggle stay
+  visible; **category / time / difficulty** live in a collapsible **"Filtres" disclosure**
+  (`app/components/filter-disclosure.tsx` — adaptive pill with active-filter summary + count
+  badge + "Tout effacer", isolated panel below), the **same component used by `/saisons`**.
 - **Writes** = typed **Server Actions** (`app/recettes/actions.ts`) validated with Zod
   (`lib/validation.ts`), then `revalidatePath`. Slugs are generated from the title and
   made unique (`slugify` + collision suffix).
@@ -301,6 +304,7 @@ rendering, which these pages already are).
   `nav-more-menu` (desktop "Plus" dropdown), `nav-data` (shared secondary-nav data),
   `breadcrumb` (global server breadcrumb, ≥ sm), `notif-bell` (notification bell + panel),
   `widgets-dock` (floating kitchen-widgets dock + timer engine, client, in the root layout),
+  `filter-disclosure` (shared "Filtres" pill + collapsible panel, used by /recettes + /saisons),
   `coming-soon` (stub page), `loader` (page-transition logo loader), `site-footer`.
 - `lib/notifications.ts` — `getNotifications()` (cache()'d): derived "À traiter" signals +
   per-section counts, consumed by the bell, the mobile "Plus" badge, and the settings rail.

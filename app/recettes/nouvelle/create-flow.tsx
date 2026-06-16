@@ -68,14 +68,18 @@ function MethodCard({
         <b className="flex items-center gap-2 text-[15px] font-bold text-ink">
           {title}
           {disabled && badge && (
-            <span className="rounded-full bg-surface-muted px-1.5 py-0.5 font-mono text-[9.5px] uppercase tracking-[0.08em] text-ink-faint">
-              {badge}
+            <span className="inline-flex items-center gap-1 rounded-full bg-surface-muted px-1.5 py-0.5 font-mono text-[9.5px] uppercase tracking-[0.08em] text-ink-faint">
+              <Icon name="lock" size={10} /> {badge}
             </span>
           )}
         </b>
         <span className="text-[13px] text-ink-soft">{desc}</span>
       </span>
-      {!disabled && <Icon name="arrow" size={18} className="shrink-0 text-ink-faint" />}
+      {disabled ? (
+        <Icon name="lock" size={16} className="shrink-0 text-ink-faint" />
+      ) : (
+        <Icon name="arrow" size={18} className="shrink-0 text-ink-faint" />
+      )}
     </button>
   );
 }
