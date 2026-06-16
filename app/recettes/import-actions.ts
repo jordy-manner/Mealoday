@@ -13,13 +13,68 @@ import {
   type GeminiImage,
   type GeminiRecipe,
 } from "@/lib/gemini";
-import { geminiConfigured } from "@/lib/settings";
+import { geminiConfigured, getScraperApiKey, scraperApiConfigured } from "@/lib/settings";
 
 export type ExtractResult =
   | { ok: true; values: RecipeFormValues }
   | { ok: false; error: string };
 
 const FETCH_TIMEOUT_MS = 12_000;
+const SCRAPER_ENDPOINT = "https://api.scraperapi.com/";
+const SCRAPER_TIMEOUT_MS = 40_000; // ScraperAPI proxies the request → allow more time
+
+/** Direct page fetch with a browser-like UA; returns null on network/timeout error. */
+async function directFetch(url: string): Promise<Response | null> {
+  try {
+    return await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; MarmiteBot/1.0; +recipe-import)",
+        Accept: "text/html",
+      },
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+      redirect: "follow",
+    });
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Fetches a recipe page's HTML. Tries a direct fetch first; only when the site
+ * blocks it (403/429/503 or a network failure) AND a ScraperAPI key is
+ * configured does it retry through ScraperAPI (proxy/anti-bot bypass). Never
+ * uses ScraperAPI systematically — it stays a fallback to save credits.
+ */
+async function fetchPageHtml(url: string): Promise<{ ok: true; html: string } | { ok: false; error: string }> {
+  const res = await directFetch(url);
+  if (res?.ok) return { ok: true, html: await res.text() };
+
+  const blocked = !res || res.status === 403 || res.status === 429 || res.status === 503;
+  if (blocked && (await scraperApiConfigured())) {
+    const key = await getScraperApiKey();
+    // ScraperAPI params must precede `url` to avoid clashing with the target's query.
+    const proxied = `${SCRAPER_ENDPOINT}?api_key=${encodeURIComponent(key!)}&country_code=fr&url=${encodeURIComponent(url)}`;
+    try {
+      const sres = await fetch(proxied, { signal: AbortSignal.timeout(SCRAPER_TIMEOUT_MS) });
+      if (sres.ok) return { ok: true, html: await sres.text() };
+      return { ok: false, error: `Le service de contournement a répondu ${sres.status}.` };
+    } catch (e) {
+      const msg = e instanceof Error && e.name === "TimeoutError"
+        ? "Le contournement a mis trop de temps."
+        : "Échec du contournement (ScraperAPI).";
+      return { ok: false, error: msg };
+    }
+  }
+
+  if (res && res.status === 403) {
+    return {
+      ok: false,
+      error: "Ce site bloque l'extraction (403). Renseignez une clé ScraperAPI (Paramètres › Général) pour contourner.",
+    };
+  }
+  if (res) return { ok: false, error: `La page a répondu ${res.status}. Vérifiez l'adresse.` };
+  return { ok: false, error: "Impossible de récupérer la page." };
+}
 // Max characters of cleaned page text sent to Gemini (keeps token cost bounded).
 const GEMINI_INPUT_MAX = 24_000;
 
@@ -209,22 +264,9 @@ export async function extractRecipeFromUrl(rawUrl: string, useAi = true): Promis
     return { ok: false, error: "Adresse invalide — collez une URL commençant par http(s)://." };
   }
 
-  let html: string;
-  try {
-    const res = await fetch(url, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; MarmiteBot/1.0; +recipe-import)",
-        Accept: "text/html",
-      },
-      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-      redirect: "follow",
-    });
-    if (!res.ok) return { ok: false, error: `La page a répondu ${res.status}. Vérifiez l'adresse.` };
-    html = await res.text();
-  } catch (e) {
-    const msg = e instanceof Error && e.name === "TimeoutError" ? "La page a mis trop de temps à répondre." : "Impossible de récupérer la page.";
-    return { ok: false, error: msg };
-  }
+  const page = await fetchPageHtml(url);
+  if (!page.ok) return { ok: false, error: page.error };
+  const html = page.html;
 
   // Locate the first schema.org/Recipe JSON-LD node, if any.
   const blocks = [...html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)];

@@ -2,6 +2,15 @@
 
 All notable changes to the project, by release. Versions follow the `vMAJOR.MINOR.PATCH` format; each release maps to a git tag and a Vercel Preview/Production deployment.
 
+## [v0.3.6] — 2026-06-16
+
+- **Web import — ScraperAPI 403 bypass**: when the direct fetch is blocked
+  (403/429/503 or a network failure) and a **ScraperAPI** key is configured, the
+  crawl retries through ScraperAPI (e.g. Marmiton). It is a **fallback only** —
+  never used systematically (saves credits). Without a key, a blocked page now
+  returns a clear message pointing to Paramètres › Général. New `SCRAPERAPI_KEY`
+  server secret (env or Setting, like Pexels/Gemini) + a key field in Général.
+
 ## [v0.3.5] — 2026-06-16
 
 - **Grouped filters** (design handoff `filters_gemini`): on the home and the

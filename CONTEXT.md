@@ -55,7 +55,7 @@ All many-to-many relations use **explicit join tables** (project convention).
 - **Utensil** + **RecipeUtensil** — join carrying `quantity?` (Int), `position`.
   Utensil also has a catalog `image?` + `imagePublicId?` (edited from `/parametres`).
 - **Setting** — server-side key/value store (`key` PK, `value`, `updatedAt`).
-  Holds the Pexels + Gemini API keys + seasonal-check frequency/last-check date. Secrets
+  Holds the Pexels + Gemini + ScraperAPI keys + seasonal-check frequency/last-check date. Secrets
   read server-side only, never sent to the client (`lib/settings.ts`).
 - **Tag** + **RecipeTag** — shared tags.
 - **Category** + **RecipeCategory** — a recipe may have several categories (`position`).
@@ -82,8 +82,10 @@ User-facing routes are **in French**; the REST API stays `/api/recipes`.
   client): **Importer depuis le web** / **Scanner une photo** (OCR) / **Saisie
   manuelle**; the method is mirrored to `?method=`, each sub-step + the manual
   form have a "Retour aux choix" button. **Web import** is live (paste a URL →
-  `extractRecipeFromUrl` server action fetches the page server-side; when a Gemini
-  key is configured it sends the content to Gemini for clean structuring (the
+  `extractRecipeFromUrl` server action fetches the page server-side (direct fetch;
+  on a block — 403/429/503 — it retries through **ScraperAPI** when a key is set,
+  never systematically); when a Gemini key is configured it sends the content to
+  Gemini for clean structuring (the
   JSON-LD recipe node if present, else the cleaned page text), and otherwise falls
   back to a built-in **schema.org/Recipe** parser (JSON-LD incl. `@graph`, then a
   title fallback). Prefills title/description/ingredients/steps/times/servings/image,
@@ -124,9 +126,9 @@ User-facing routes are **in French**; the REST API stays `/api/recipes`.
   `_rail.tsx`, grouped Préférences / Catalogues / Référentiels / Données, sticky,
   active item `bg-accent-soft text-accent-ink`). `/parametres` redirects to
   `/parametres/ingredients`. Sub-routes:
-  - `/parametres/general` — Pexels API key + **Gemini API key** (server secrets,
-    `lib/settings`, generic `ApiKeyForm`). The Gemini key enables the photo-scan
-    creation method.
+  - `/parametres/general` — Pexels + **Gemini** + **ScraperAPI** keys (server
+    secrets, `lib/settings`, generic `ApiKeyForm`). Gemini enables the photo-scan
+    method; ScraperAPI is the web-import 403 bypass (fallback only).
   - `/parametres/apparence` — theme (clair/sombre) + accent (Terracotta/Paprika/
     Ambre/Olive), a **client preference** (localStorage), applied app-wide by
     overriding `--color-*` on `<html>` (see Design system / dark mode).
@@ -379,7 +381,11 @@ token swap adds `.no-transition` on `<html>` for one frame (`app/globals.css`).
 - `GEMINI_API_KEY` — Google Gemini API key for the recipe photo scan (`lib/gemini.ts`,
   server-only). Like Pexels, a value saved from `/parametres/general` (Setting table)
   overrides it (`getGeminiKey`). Unset → the scan creation method is disabled.
-  `GEMINI_MODEL` (optional) overrides the model id (default `gemini-2.5-flash`). The seasonal produce itself (fruits,
+  `GEMINI_MODEL` (optional) overrides the model id (default `gemini-2.5-flash`).
+- `SCRAPERAPI_KEY` — ScraperAPI key for the web-import 403 bypass (`lib/settings`
+  `getScraperApiKey`, or saved from `/parametres/general`). Used only as a fallback
+  when a recipe page blocks the direct crawl. Unset → blocked pages just report the
+  block. The seasonal produce itself (fruits,
   vegetables, pulses, herbs) is stored in the **DB** (Ingredient season fields, editable
   from the app/CLI); `lib/data/seasonality.json` + `carbon-ademe.json` are the committed
   **seed source + fallback** (no external runtime API on reads). Carbon (`ecv`) comes
