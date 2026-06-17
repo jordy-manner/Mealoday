@@ -190,14 +190,16 @@ Séquence :
 
 3. Si bloqué :
    GH_TOKEN={nightshift_token} gh issue comment {numéro} --repo jordy-manner/recipe-manager --body "🚧 Blocked: {reason}"
+   GH_TOKEN={nightshift_token} gh api repos/jordy-manner/recipe-manager/issues/{pr_number}/labels --method POST --field 'labels[]=Status:Needs Work'
    curl -s -H "Title: 🚧 Blocked #{numéro}" -H "Tags: warning" -H "Priority: high" -d "{reason}" https://ntfy.sh/{topic}
    Arrête-toi et attends.
 
 4. Quand terminé, pousse la branche :
    git push origin {branch}
 
-5. Ajoute le label `hasPR` sur l'issue et poste le comment de fin :
+5. Ajoute les labels et poste le comment de fin :
    GH_TOKEN={nightshift_token} gh issue edit {numéro} --repo jordy-manner/recipe-manager --add-label "hasPR"
+   GH_TOKEN={nightshift_token} gh api repos/jordy-manner/recipe-manager/issues/{pr_number}/labels --method POST --field 'labels[]=Status:Needs Review'
    GH_TOKEN={nightshift_token} gh issue comment {numéro} --repo jordy-manner/recipe-manager --body "✅ Implementation done — branch \`{branch}\` ready for review."
 
 6. curl -s -H "Title: ✅ #{numéro} ready" -H "Tags: white_check_mark" -d "{titre} — ready for review" https://ntfy.sh/{topic}
