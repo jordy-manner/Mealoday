@@ -178,7 +178,7 @@ Règles :
 - Commits atomiques avec refs #{numéro}.
 - Après changement UI : npm run check:design.
 - NE PAS ajouter Co-Authored-By dans les messages de commit.
-- NE PAS ouvrir de PR — la validation et la PR sont faites manuellement par jordy-manner.
+- PR ouverte par le bot via GH_TOKEN={nightshift_token} — jordy-manner review et merge manuellement.
 - Tous les GitHub comments, messages de commit et corps de PR sont rédigés en **anglais**.
 
 Séquence :
@@ -197,7 +197,24 @@ Séquence :
 4. Quand terminé, pousse la branche :
    git push origin {branch}
 
-5. Ajoute les labels et poste le comment de fin :
+5. Ouvre la PR via le bot avec corps structuré (issue title + problem summary + changes + acceptance criteria) :
+   GH_TOKEN={nightshift_token} gh pr create --repo jordy-manner/recipe-manager \
+     --head {branch} --base v0.X \
+     --title "{commit title}" \
+     --body "## Issue
+Closes #{numéro} — {issue title}
+
+> {one-line problem summary from issue body}
+
+## Changes
+{bullet list of files changed and what was done}
+
+## Acceptance criteria
+{copy acceptance criteria checkboxes from issue}
+
+🌙 Night shift — man-work-nightshift-bot"
+
+6. Ajoute les labels et poste le comment de fin :
    GH_TOKEN={nightshift_token} gh issue edit {numéro} --repo jordy-manner/recipe-manager --add-label "hasPR"
    GH_TOKEN={nightshift_token} gh api repos/jordy-manner/recipe-manager/issues/{pr_number}/labels --method POST --field 'labels[]=Status:Needs Review'
    GH_TOKEN={nightshift_token} gh issue comment {numéro} --repo jordy-manner/recipe-manager --body "✅ Implementation done — branch \`{branch}\` ready for review."
