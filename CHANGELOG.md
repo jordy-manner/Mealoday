@@ -2,6 +2,10 @@
 
 All notable changes to the project, by release. Versions follow the `vMAJOR.MINOR.PATCH` format; each release maps to a git tag and a Vercel Preview/Production deployment.
 
+## [v0.4.4] — 2026-06-19
+
+- **Docker self-hosting** (#46): Dockerfile (multi-stage standalone), `docker-compose.yml` (app + postgres), `scripts/docker-entrypoint.sh` (migrate + start), `.env.docker.example`; `lib/prisma.ts` gates Neon adapter behind `PRISMA_DRIVER_ADAPTER=neon`; `next.config.ts` adds `output: 'standalone'`.
+
 ## [v0.4.3] — 2026-06-19
 
 - **Parametres redirect** (#53): `/parametres` now redirects to `/parametres/general` instead of `/parametres/ingredients`.
