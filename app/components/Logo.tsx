@@ -32,6 +32,9 @@ export function Egg({ className = "", size }: { className?: string; size?: numbe
  */
 export function Logo({ size = 21 }: { size?: number }) {
   const eggSize = Math.round(size * 1.3);
+  // Extrude depth scales with size: 3 layers at ≤21px, 6 at ≥42px (matches design spec).
+  const depth = Math.min(6, Math.max(3, Math.round(size / 7)));
+  const extrude = Array.from({ length: depth }, (_, i) => `-${i + 1}px ${i + 1}px 0 #15223d`).join(", ");
   return (
     <span
       aria-label="Sur le Plat"
@@ -49,12 +52,12 @@ export function Logo({ size = 21 }: { size?: number }) {
           fontFamily: "var(--font-bangers, Bangers, cursive)",
           fontWeight: 400,
           fontSize: size,
-          letterSpacing: "0.03em",
+          letterSpacing: "0.04em",
           textTransform: "uppercase",
           color: "#f5c700",
-          WebkitTextStroke: `${Math.max(1, size * 0.07)}px #16181f`,
+          WebkitTextStroke: `${Math.max(1, Math.round(size * 0.06))}px #16181f`,
           paintOrder: "stroke fill",
-          textShadow: `-1px 1px 0 #15223d, -2px 2px 0 #15223d, -3px 3px 0 #15223d`,
+          textShadow: extrude,
           whiteSpace: "nowrap",
         }}
       >

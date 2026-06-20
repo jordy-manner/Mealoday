@@ -278,6 +278,34 @@ body {
   pointer-events: none;
 }
 
+/*
+ * Preloader — theme-aware full-screen overlay.
+ * data-theme is set before first paint by ThemeScript, so these selectors fire
+ * before the loader is visible and produce no flash.
+ */
+.loader-wrap {
+  background: #101012;
+  background-image: radial-gradient(rgb(255 255 255 / 0.03) 1px, transparent 1.4px);
+  background-size: 11px 11px;
+  background-attachment: fixed;
+}
+[data-theme="light"] .loader-wrap {
+  background: var(--color-bg);
+  background-image: radial-gradient(rgb(0 0 0 / 0.04) 1px, transparent 1.4px);
+  background-size: 11px 11px;
+  background-attachment: fixed;
+}
+.loader-bubble {
+  background: #101012;
+}
+[data-theme="light"] .loader-bubble {
+  background: var(--color-bg);
+  box-shadow: 0 16px 34px rgb(60 45 15 / 0.2);
+}
+[data-theme="light"] .loader-egg svg {
+  filter: drop-shadow(0 2px 0 rgb(0 0 0 / 0.4));
+}
+
 /* Hide the scrollbar while keeping scroll/swipe (seasonal "shelf" sliders). */
 .no-scrollbar {
   scrollbar-width: none;

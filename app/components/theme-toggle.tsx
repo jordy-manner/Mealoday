@@ -28,13 +28,13 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
       aria-pressed={isDark}
       className={`grid h-9 w-9 place-items-center rounded-full transition hover:bg-white/[0.12] ${className}`}
     >
-      {/* Lightbulb icon: filled yellow when dark (on), stroked dim when light (off) */}
+      {/* Lightbulb icon: yellow/filled = currently light (click → go dark); dim/outline = currently dark (click → go light). */}
       <svg
         width="18"
         height="18"
         viewBox="0 0 24 24"
-        fill={isDark ? "#f5c700" : "none"}
-        stroke={isDark ? "#f5c700" : "currentColor"}
+        fill={isDark ? "none" : "#f5c700"}
+        stroke={isDark ? "currentColor" : "#f5c700"}
         strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
