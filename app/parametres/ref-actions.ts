@@ -28,6 +28,7 @@ const nameSchema = z.string().trim().min(1, "Le nom est obligatoire").max(60);
 function revalidateRefConsumers() {
   revalidatePath("/parametres/ingredients");
   revalidatePath("/parametres/unites");
+  revalidatePath("/parametres/unites-portions");
   revalidatePath("/parametres/rayons");
   revalidatePath("/parametres/types-unite");
   revalidatePath("/parametres/tags");
@@ -149,6 +150,48 @@ export async function deleteUnitType(id: string): Promise<RefResult> {
     return { ok: false, error: `Utilisé par ${count} unité${count > 1 ? "s" : ""} — réaffectez-les d'abord.` };
   }
   await prisma.unitType.delete({ where: { id } });
+  revalidateRefConsumers();
+  return { ok: true };
+}
+
+/* ------------------------------------------------------------------ */
+/* ServingUnit (unités de portion)                                     */
+/* ------------------------------------------------------------------ */
+
+export async function createServingUnit(rawName: string): Promise<RefResult<{ row: RefRow }>> {
+  const parsed = nameSchema.safeParse(rawName);
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0].message };
+  const name = parsed.data;
+  const existing = await prisma.servingUnit.findMany({ select: { id: true, name: true } });
+  const near = existing.find((u) => norm(u.name) === norm(name));
+  if (near) return { ok: true, row: { id: near.id, name: near.name, uses: 0 } };
+  try {
+    const created = await prisma.servingUnit.create({ data: { name }, select: { id: true, name: true } });
+    revalidateRefConsumers();
+    return { ok: true, row: { ...created, uses: 0 } };
+  } catch (e) {
+    return { ok: false, error: writeError(e, "Une unité de portion porte déjà ce nom") };
+  }
+}
+
+export async function renameServingUnit(id: string, rawName: string): Promise<RefResult> {
+  const parsed = nameSchema.safeParse(rawName);
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0].message };
+  try {
+    await prisma.servingUnit.update({ where: { id }, data: { name: parsed.data } });
+    revalidateRefConsumers();
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: writeError(e, "Une unité de portion porte déjà ce nom") };
+  }
+}
+
+export async function deleteServingUnit(id: string): Promise<RefResult> {
+  const count = await prisma.recipe.count({ where: { servingUnitId: id } });
+  if (count > 0) {
+    return { ok: false, error: `Utilisée par ${count} recette${count > 1 ? "s" : ""} — réaffectez-les d'abord.` };
+  }
+  await prisma.servingUnit.delete({ where: { id } });
   revalidateRefConsumers();
   return { ok: true };
 }

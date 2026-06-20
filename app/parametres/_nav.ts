@@ -21,6 +21,7 @@ export const SETTINGS_NAV: SettingsGroup[] = [
       { slug: "ingredients", label: "Ingrédients", icon: "carrot" },
       { slug: "ustensiles", label: "Ustensiles", icon: "tool" },
       { slug: "unites", label: "Unités", icon: "ruler" },
+      { slug: "unites-portions", label: "Unités de portion", icon: "users" },
     ],
   },
   {
