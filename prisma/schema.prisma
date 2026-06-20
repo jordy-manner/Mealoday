@@ -31,7 +31,8 @@ model Recipe {
   difficulty  Int? // 1 = easy, 2 = medium, 3 = hard
   rating      Float? // average rating out of 5
   author      String?
-  popular     Boolean  @default(false) // featured in the "popular" section
+  popular         Boolean  @default(false) // featured in the "popular" section
+  ingredientStep  Boolean  @default(false) // show a pre-step card listing ingredients as checkable items
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
