@@ -2,6 +2,10 @@
 
 All notable changes to the project, by release. Versions follow the `vMAJOR.MINOR.PATCH` format; each release maps to a git tag and a Vercel Preview/Production deployment.
 
+## [v0.4.5] — 2026-06-20
+
+- **Serving unit** (#67, closes #59): new `ServingUnit` model + `servingUnitId` FK on `Recipe`; combobox next to Portions field (default: personnes); Gemini and URL import extract unit; admin CRUD at `/parametres/unites-portions`; recipe detail shows `{count} {unit}`.
+
 ## [v0.4.4] — 2026-06-19
 
 - **Docker self-hosting** (#46): Dockerfile (multi-stage standalone), `docker-compose.yml` (app + postgres), `scripts/docker-entrypoint.sh` (migrate + start), `.env.docker.example`; `lib/prisma.ts` gates Neon adapter behind `PRISMA_DRIVER_ADAPTER=neon`; `next.config.ts` adds `output: 'standalone'`.

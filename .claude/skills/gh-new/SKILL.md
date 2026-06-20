@@ -1,5 +1,5 @@
 ---
-name: gh new
+name: gh-new
 description: Crée une nouvelle issue GitHub + branche + worktree pour une tâche (feat/fix/chore). À utiliser dès qu'on commence une nouvelle tâche (ex. « /gh new », « nouvelle tâche », « crée une issue », « commence un fix »). Collecte le contexte via un jeu de questions-réponses avant de créer l'issue.
 ---
 

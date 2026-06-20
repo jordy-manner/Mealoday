@@ -1,9 +1,9 @@
 ---
-name: git-reviewed
+name: gh-reviewed
 description: Traite les PRs marquées Status:Reviewed — sélection par checklist, squash merge dans la branche de base, preview-release (patch bump + déploiement Vercel), nettoyage branche/labels/issue/worktree. Un preview-release par PR, séquentiellement.
 ---
 
-# git-reviewed — merge & release des PRs reviewées
+# gh-reviewed — merge & release des PRs reviewées
 
 Workflow de merge pour les PRs ayant passé la review. Pour chaque PR sélectionnée : squash merge → preview-release → nettoyage complet. Traitement **séquentiel**, une PR à la fois.
 
