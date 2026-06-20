@@ -19,7 +19,7 @@ export default async function NewRecipePage({
   const { method } = await searchParams;
   const initialMethod: Method =
     method === "manual" || method === "web" || method === "scan" ? method : "choose";
-  const [ingredients, units, utensils, tags, categories, unitTypes, scanEnabled] = await Promise.all([
+  const [ingredients, units, utensils, tags, categories, unitTypes, servingUnits, scanEnabled] = await Promise.all([
     prisma.ingredient.findMany({
       orderBy: { name: "asc" },
       select: { name: true, aisleId: true, defaultUnitId: true, defaultUnit: { select: { name: true } } },
@@ -29,6 +29,7 @@ export default async function NewRecipePage({
     prisma.tag.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
     prisma.category.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
     prisma.unitType.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
+    prisma.servingUnit.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
     geminiConfigured(),
   ]);
 
@@ -47,6 +48,7 @@ export default async function NewRecipePage({
         tagOptions={tags.map((t) => t.name)}
         categoryOptions={categories.map((c) => c.name)}
         unitTypeOptions={unitTypes}
+        servingUnitOptions={servingUnits.map((u) => u.name)}
         mediaEnabled={getMediaStore().configured}
         scanEnabled={scanEnabled}
       />

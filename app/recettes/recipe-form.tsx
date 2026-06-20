@@ -65,6 +65,7 @@ export type RecipeFormValues = {
   title: string;
   description: string;
   servings: string;
+  servingUnit: string;
   prepTime: string;
   cookTime: string;
   restTime: string;
@@ -93,6 +94,7 @@ export const EMPTY_RECIPE_VALUES: RecipeFormValues = {
   title: "",
   description: "",
   servings: "",
+  servingUnit: "personnes",
   prepTime: "",
   cookTime: "",
   restTime: "",
@@ -430,6 +432,7 @@ export function RecipeForm({
   tagOptions,
   categoryOptions,
   unitTypeOptions,
+  servingUnitOptions = [],
   mediaEnabled = false,
   sourcePrefilled = false,
 }: {
@@ -442,6 +445,7 @@ export function RecipeForm({
   tagOptions: string[];
   categoryOptions: string[];
   unitTypeOptions: { id: string; name: string }[];
+  servingUnitOptions?: string[];
   mediaEnabled?: boolean;
   /** Shows a "source pre-filled" banner (web-import method). */
   sourcePrefilled?: boolean;
@@ -458,6 +462,7 @@ export function RecipeForm({
     title: defaultValues.title,
     description: defaultValues.description,
     servings: defaultValues.servings,
+    servingUnit: defaultValues.servingUnit,
     prepTime: defaultValues.prepTime,
     cookTime: defaultValues.cookTime,
     restTime: defaultValues.restTime,
@@ -925,15 +930,31 @@ export function RecipeForm({
               </Field>
             </div>
             <div className="flex-1">
-              <Field label="Portions" hint="pers.">
-                <input
-                  name="servings"
-                  type="number"
-                  min="1"
-                  value={f.servings}
-                  onChange={(e) => set({ servings: e.target.value })}
-                  className={fieldCls}
-                />
+              <Field label="Portions">
+                <div className="flex gap-2">
+                  <input
+                    name="servings"
+                    type="number"
+                    min="1"
+                    value={f.servings}
+                    onChange={(e) => set({ servings: e.target.value })}
+                    placeholder="4"
+                    className={`${fieldBase} w-20 shrink-0`}
+                  />
+                  <input
+                    name="servingUnit"
+                    list="serving-unit-list"
+                    value={f.servingUnit}
+                    onChange={(e) => set({ servingUnit: e.target.value })}
+                    placeholder="personnes"
+                    className={`${fieldBase} min-w-0 flex-1`}
+                  />
+                  <datalist id="serving-unit-list">
+                    {["personnes", ...servingUnitOptions.filter((u) => u !== "personnes")].map((u) => (
+                      <option key={u} value={u} />
+                    ))}
+                  </datalist>
+                </div>
               </Field>
             </div>
           </div>
