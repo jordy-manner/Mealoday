@@ -23,6 +23,7 @@ type FormProps = {
   tagOptions: string[];
   categoryOptions: string[];
   unitTypeOptions: { id: string; name: string }[];
+  servingUnitOptions: string[];
   mediaEnabled: boolean;
   /** Photo scan is available only when a Gemini key is configured. */
   scanEnabled: boolean;

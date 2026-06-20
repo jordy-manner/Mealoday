@@ -15,10 +15,11 @@ export const dynamic = "force-dynamic";
 
 export default async function EditRecipePage({ params }: Props) {
   const { slug } = await params;
-  const [row, ingredients, units, utensils, tags, categories, unitTypes] = await Promise.all([
+  const [row, ingredients, units, utensils, tags, categories, unitTypes, servingUnits] = await Promise.all([
     prisma.recipe.findUnique({
       where: { slug },
       include: {
+        servingUnit: { select: { name: true } },
         recipeIngredients: {
           include: { ingredient: true, unit: true },
           orderBy: { position: "asc" },
@@ -47,6 +48,7 @@ export default async function EditRecipePage({ params }: Props) {
     prisma.tag.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
     prisma.category.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
     prisma.unitType.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
+    prisma.servingUnit.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
   ]);
 
   if (!row) {
@@ -82,11 +84,13 @@ export default async function EditRecipePage({ params }: Props) {
         tagOptions={tags.map((t) => t.name)}
         categoryOptions={categories.map((c) => c.name)}
         unitTypeOptions={unitTypes}
+        servingUnitOptions={servingUnits.map((u) => u.name)}
         mediaEnabled={getMediaStore().configured}
         defaultValues={{
           title: recipe.title,
           description: recipe.description ?? "",
           servings: recipe.servings?.toString() ?? "",
+          servingUnit: row.servingUnit?.name ?? "personnes",
           prepTime: recipe.prepTime?.toString() ?? "",
           cookTime: recipe.cookTime?.toString() ?? "",
           restTime: recipe.restTime?.toString() ?? "",
