@@ -43,6 +43,7 @@ export type RecipeDetailData = {
   utensils: { name: string; quantity: number | null }[];
   steps: { content: string; sectionId: string | null }[];
   sources: { value: string; kind: "url" | "text" }[];
+  ingredientStep: boolean;
 };
 
 /** Formats a scaled quantity: trims to 2 decimals, drops trailing zeros. */
@@ -80,6 +81,7 @@ export function RecipeDetail({
   const base = recipe.servings && recipe.servings > 0 ? recipe.servings : 1;
   const [serves, setServes] = useState(base);
   const [done, setDone] = useState<Record<number, boolean>>({});
+  const [prepDone, setPrepDone] = useState<Record<number, boolean>>({});
 
   const factor = serves / base;
   const total = (recipe.prepTime ?? 0) + (recipe.cookTime ?? 0) + (recipe.restTime ?? 0);
@@ -295,6 +297,17 @@ export function RecipeDetail({
         {/* Steps */}
         <section className="min-w-0">
           <h2 className="mb-4 font-display text-[24px] font-medium">Préparation</h2>
+
+          {recipe.ingredientStep && recipe.ingredients.length > 0 && (
+            <div className="mb-3.5">
+              <IngPrepCard
+                recipe={recipe}
+                factor={factor}
+                prepDone={prepDone}
+                setPrepDone={setPrepDone}
+              />
+            </div>
+          )}
           {recipe.steps.length > 0 ? (
             <div className="flex flex-col gap-3.5">
               {/* Ungrouped steps first. */}
@@ -449,6 +462,95 @@ function StepItem({
         }`}
       >
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{step.content}</ReactMarkdown>
+      </div>
+    </div>
+  );
+}
+
+/** Checkable ingredient line in the prep step card. Same UX as StepItem. */
+function IngPrepItem({
+  ing,
+  factor,
+  idx,
+  prepDone,
+  setPrepDone,
+}: {
+  ing: { name: string; quantity: number | null; unit: string | null };
+  factor: number;
+  idx: number;
+  prepDone: Record<number, boolean>;
+  setPrepDone: React.Dispatch<React.SetStateAction<Record<number, boolean>>>;
+}) {
+  const isDone = prepDone[idx];
+  const qty = ing.quantity != null ? fmtQty(ing.quantity * factor) : null;
+  return (
+    <div
+      onClick={() => setPrepDone((d) => ({ ...d, [idx]: !d[idx] }))}
+      className={`flex cursor-pointer items-center gap-4 rounded-card border p-4 transition ${
+        isDone
+          ? "border-line-soft bg-surface-muted"
+          : "border-line-soft bg-surface hover:border-line"
+      }`}
+    >
+      <span
+        className={`grid h-6 w-6 shrink-0 place-items-center rounded-full transition ${
+          isDone ? "bg-veg text-white" : "bg-accent-soft text-accent-ink"
+        }`}
+      >
+        {isDone ? <Icon name="check" size={13} /> : null}
+      </span>
+      <span className={`min-w-[72px] shrink-0 font-mono text-[13.5px] font-medium text-accent-ink ${isDone ? "text-ink-faint" : ""}`}>
+        {[qty, ing.unit].filter(Boolean).join(" ")}
+      </span>
+      <span className={`text-[15px] ${isDone ? "text-ink-faint line-through" : "text-ink"}`}>
+        {ing.name}
+      </span>
+    </div>
+  );
+}
+
+/** Pre-step card listing all ingredients as checkable items. */
+function IngPrepCard({
+  recipe,
+  factor,
+  prepDone,
+  setPrepDone,
+}: {
+  recipe: RecipeDetailData;
+  factor: number;
+  prepDone: Record<number, boolean>;
+  setPrepDone: React.Dispatch<React.SetStateAction<Record<number, boolean>>>;
+}) {
+  return (
+    <div className="flex flex-col gap-3.5 rounded-card border border-line-soft bg-surface p-5 shadow-card">
+      <div className="flex items-center gap-2">
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-accent-soft font-mono text-[13px] font-bold text-accent-ink">
+          <Icon name="star" size={15} fill="currentColor" />
+        </span>
+        <span className="font-display text-[19px] font-medium">Préparation des ingrédients</span>
+      </div>
+      <div className="flex flex-col gap-2">
+        {recipe.ingredients
+          .filter((ing) => ing.sectionId === null)
+          .map((ing, i) => (
+            <IngPrepItem key={i} ing={ing} factor={factor} idx={i} prepDone={prepDone} setPrepDone={setPrepDone} />
+          ))}
+        {recipe.ingSections.map((sec) => {
+          const secIngs = recipe.ingredients.filter((ing) => ing.sectionId === sec.id);
+          if (!secIngs.length) return null;
+          const offset = recipe.ingredients.filter((ing) => ing.sectionId === null).length +
+            recipe.ingSections
+              .slice(0, recipe.ingSections.indexOf(sec))
+              .reduce((acc, s) => acc + recipe.ingredients.filter((ing) => ing.sectionId === s.id).length, 0);
+          return (
+            <div key={sec.id}>
+              <SectionLabel title={sec.title} />
+              {secIngs.map((ing, i) => (
+                <IngPrepItem key={i} ing={ing} factor={factor} idx={offset + i} prepDone={prepDone} setPrepDone={setPrepDone} />
+              ))}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

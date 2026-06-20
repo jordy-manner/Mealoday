@@ -113,6 +113,7 @@ export default async function RecipeDetailPage({ params }: Props) {
     utensils: flat.utensils.map((u) => ({ name: u.name, quantity: u.quantity })),
     steps: flat.steps,
     sources: flat.sources,
+    ingredientStep: row.ingredientStep,
   };
 
   return <RecipeDetail recipe={recipe} related={related} />;
