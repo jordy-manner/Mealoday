@@ -2,6 +2,10 @@
 
 All notable changes to the project, by release. Versions follow the `vMAJOR.MINOR.PATCH` format; each release maps to a git tag and a Vercel Preview/Production deployment.
 
+## [v0.4.6] — 2026-06-20
+
+- **Ingredient prep step** (#66, closes #61): `ingredientStep` boolean on `Recipe`; when enabled, shows a pre-step card listing all ingredients as checkable items before step 1.
+
 ## [v0.4.5] — 2026-06-20
 
 - **Serving unit** (#67, closes #59): new `ServingUnit` model + `servingUnitId` FK on `Recipe`; combobox next to Portions field (default: personnes); Gemini and URL import extract unit; admin CRUD at `/parametres/unites-portions`; recipe detail shows `{count} {unit}`.
