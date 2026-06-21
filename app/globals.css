@@ -333,10 +333,9 @@ body {
   container-type: inline-size;
   display: flex;
   align-items: center;
-  gap: 5%;
+  gap: 12px;
 }
-/* Egg: percentage of the column so it scales with the grid column width.     */
-.foot-egg { flex: none; width: 27%; aspect-ratio: 1; }
+.foot-egg { flex: none; width: 24cqw; height: 24cqw; }
 /* Override SVG pixel-sized width/height attributes via CSS (presentation attrs). */
 .foot-egg svg { width: 100%; height: 100%; display: block; }
 .foot-lockup {
@@ -347,23 +346,20 @@ body {
   justify-content: center;
   gap: 3px;
 }
-/* font-size in cqw = % of .foot-intro container width.
-   lockup ≈ 68% of container (100% - 27% egg - 5% gap).
-   "SUR LE PLAT" (Bangers, condensed) fills ~8.5 × font-size → 8cqw ≈ 68cqw. */
 .foot-brand-name {
   color: var(--color-accent);
   font-family: var(--font-logo);
-  font-size: 8cqw;
+  font-size: 17cqw;
   line-height: 1;
   white-space: nowrap;
-  -webkit-text-stroke: 2px #16181f;
+  -webkit-text-stroke: 3px #16181f;
   paint-order: stroke fill;
   text-shadow: -1px 1px 0 #15223d, -2px 2px 0 #15223d, -3px 3px 0 #15223d,
-               -4px 4px 0 #15223d, -5px 5px 0 #15223d;
+               -4px 4px 0 #15223d, -5px 5px 0 #15223d, -6px 6px 0 #15223d;
 }
 .foot-tag {
   color: var(--color-ink-soft);
-  font-size: 2.4cqw;
+  font-size: 4cqw;
   font-weight: 400;
   white-space: nowrap;
   overflow: hidden;
