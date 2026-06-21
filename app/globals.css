@@ -359,13 +359,10 @@ body {
 }
 .foot-tag {
   color: var(--color-ink-soft);
-  font-size: 4cqw;
+  font-size: 3cqw;
   font-weight: 400;
   white-space: nowrap;
   overflow: hidden;
-  width: 100%;
-  text-align: justify;
-  text-align-last: justify;
 }
 .foot-col-h {
   display: block;
