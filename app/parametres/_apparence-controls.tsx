@@ -22,7 +22,7 @@ export function ApparenceControls() {
 
   // Sync the controls with the preference the bootstrap script already applied.
   // localStorage is client-only (absent during SSR), so this must run after
-  // mount — the initial light/Terracotta render matches the server markup.
+  // mount — the initial light/Jaune render matches the server markup.
   useEffect(() => {
     const t = (localStorage.getItem(THEME_STORAGE) as ThemeMode) || "dark";
     const a = (localStorage.getItem(ACCENT_STORAGE) as AccentId) || "Jaune";

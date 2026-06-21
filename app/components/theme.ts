@@ -8,8 +8,12 @@
 // instantly and suppress transitions for one frame via the `no-transition`
 // class (see globals.css) so nothing animates the var() change.
 
-export const THEME_STORAGE = "mealoday-theme";
-export const ACCENT_STORAGE = "mealoday-accent";
+export const THEME_STORAGE = "sur-le-plat-theme";
+export const ACCENT_STORAGE = "sur-le-plat-accent";
+
+// Legacy keys (pre-rebrand). Used only for the one-time migration on boot.
+export const LEGACY_THEME_STORAGE = "mealoday-theme";
+export const LEGACY_ACCENT_STORAGE = "mealoday-accent";
 
 export type ThemeMode = "light" | "dark";
 

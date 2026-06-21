@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Icon } from "./icons";
 
 // Shared "Filtres" disclosure: an adaptive-width pill (funnel icon + label + a
-// summary of active filters + a count badge + chevron, Terracotta outline when
+// summary of active filters + a count badge + chevron, accent outline when
 // open/hovered, no surrounding box) that toggles an isolated panel (card border +
 // rounded-card + shadow-card) shown below. Used by /saisons and the recipe
 // search controls so the pattern stays identical. Children are the panel body.
