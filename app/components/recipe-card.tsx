@@ -104,7 +104,7 @@ export function RecipeCard({
           </div>
         )}
         <h3
-          className={`font-display font-semibold leading-tight text-ink ${big ? "text-[30px] sm:text-[38px]" : "text-[22px]"}`}
+          className={`font-display font-bold leading-tight text-ink ${big ? "text-[30px] sm:text-[38px]" : "text-[22px]"}`}
         >
           {r.title}
         </h3>
@@ -167,7 +167,7 @@ export function RecipeCardRow({
             </span>
           )}
         </div>
-        <h3 className="font-display text-[22px] font-semibold leading-tight tracking-[-0.01em] text-ink">
+        <h3 className="font-display text-[22px] font-bold leading-tight tracking-[-0.01em] text-ink">
           {r.title}
         </h3>
         {r.description && (
