@@ -31,7 +31,7 @@ export async function SiteFooter() {
           </div>
           <div className="foot-lockup">
             <span className="foot-brand-name" aria-hidden="true">Sur le Plat</span>
-            <span className="foot-tag">Toutes vos recettes dans une même coquille</span>
+            <span className="foot-tag">Vos recettes dans une même coquille</span>
           </div>
         </div>
 

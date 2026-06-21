@@ -1,6 +1,6 @@
 # Sur le Plat
 
-Toutes vos recettes dans une même coquille.
+Vos recettes dans une même coquille.
 
 ## Stack
 

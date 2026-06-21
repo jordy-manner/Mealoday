@@ -22,7 +22,7 @@
 ## 1. Identité
 
 **Sur le Plat** is a mainstream **home-cooking** app. Tagline:
-*Toutes vos recettes dans une même coquille*. The world is **comics / BD maîtrisée**: egg-on-plate
+*Vos recettes dans une même coquille*. The world is **comics / BD maîtrisée**: egg-on-plate
 hero, vintage yellow, strong outlines, discrete halftone, charcoal dark theme
 and eggshell light theme.
 
