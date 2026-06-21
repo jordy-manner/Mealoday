@@ -42,7 +42,7 @@ export function Logo({ size = 21 }: { size?: number }) {
       style={{
         display: "inline-flex",
         alignItems: "center",
-        gap: Math.round(size * 0.24),
+        gap: Math.round(size * 0.44),
         lineHeight: 1,
       }}
     >

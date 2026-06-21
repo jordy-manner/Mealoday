@@ -57,7 +57,7 @@ export function NotifBell({
         aria-expanded={open}
         className={`relative grid h-[42px] w-[42px] place-items-center rounded-full border transition ${
           dark
-            ? "border-white/[0.16] bg-white/[0.08] text-white/85 hover:border-white/40 hover:text-white"
+            ? "border-white/[0.14] bg-white/[0.06] text-ink/85 hover:border-white/40 hover:text-white"
             : "border-line bg-surface text-ink-soft hover:border-ink-faint hover:text-ink"
         }`}
       >

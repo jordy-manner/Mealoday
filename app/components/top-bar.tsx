@@ -22,8 +22,8 @@ export function TopBar({ notif }: { notif: Notifications }) {
   return (
     <header className="fixed inset-x-0 top-0 z-40 border-b border-line-soft topbar-chrome backdrop-blur-[12px]">
       <div className="mx-auto flex h-[64px] w-full max-w-content items-center gap-[22px] px-[18px] sm:px-8">
-        <Link href="/" className="shrink-0">
-          <Logo size={21} />
+        <Link href="/" className="inline-flex shrink-0 items-center">
+          <Logo size={25} />
         </Link>
 
         {/* Desktop nav — dark top bar: inactive white/75, active accent fill, hover white/12. */}

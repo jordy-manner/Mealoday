@@ -211,7 +211,7 @@ body {
   background: #101012;
 }
 
-/* Inactive nav link in top bar: ink/72 in light, white/75 in dark */
+/* Inactive nav link in top bar: ink/72 in both themes (--color-ink adapts via applyTheme) */
 .topbar-nav-inactive {
   color: color-mix(in srgb, var(--color-ink) 72%, transparent);
 }
@@ -219,12 +219,8 @@ body {
   background: rgb(0 0 0 / 0.08);
   color: var(--color-ink);
 }
-[data-theme="dark"] .topbar-nav-inactive {
-  color: rgb(255 255 255 / 0.75);
-}
 [data-theme="dark"] .topbar-nav-inactive:hover {
   background: rgb(255 255 255 / 0.12);
-  color: white;
 }
 
 /* "Plus" dropdown button in top bar — same adaptive colors */
@@ -235,12 +231,8 @@ body {
   background: rgb(0 0 0 / 0.08);
   color: var(--color-ink);
 }
-[data-theme="dark"] .topbar-plus-inactive {
-  color: rgb(255 255 255 / 0.75);
-}
 [data-theme="dark"] .topbar-plus-inactive:hover {
   background: rgb(255 255 255 / 0.12);
-  color: white;
 }
 
 /* Eyebrow: mono uppercase label used above section/hero titles. */
@@ -261,6 +253,16 @@ body {
 
 [data-theme="dark"] .hero-title em {
   color: var(--color-accent);
+}
+
+/* Breadcrumb active crumb: accent-ink/semibold in light, accent/bold in dark. */
+.crumb-active {
+  color: var(--color-accent-ink);
+  font-weight: 600;
+}
+[data-theme="dark"] .crumb-active {
+  color: var(--color-accent);
+  font-weight: 700;
 }
 
 /*
